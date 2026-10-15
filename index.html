@@ -11,13 +11,13 @@
 /* Layout: form header strip → wheel (left) + controls/totals (right) → segment log. Stacks on phones. */
 :root{
   --bg:#f5f6f8; --surface:#ffffff; --ink:#1d2330; --muted:#636b7a; --line:#dde1e8; --track:#e8ebf0;
-  --focus:#3a6df0;
+  --focus:#3a6df0; --pz:#a3aab6; --bad:#c43d33;
   --sans:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark){
-  :root{ --bg:#14171d; --surface:#1d212a; --ink:#e9ecf2; --muted:#9aa3b2; --line:#2e3441; --track:#2a303b; --focus:#7aa0ff; color-scheme: dark; }
+  :root{ --bg:#14171d; --surface:#1d212a; --ink:#e9ecf2; --muted:#9aa3b2; --line:#2e3441; --track:#2a303b; --focus:#7aa0ff; --pz:#5f6878; --bad:#ff7d72; color-scheme: dark; }
 }
 *{box-sizing:border-box}
 html,body{margin:0}
@@ -74,7 +74,7 @@ h1{font-size:1.45rem; margin:0; letter-spacing:.01em}
 .btn{font:inherit; font-weight:700; padding:11px 16px; border-radius:10px; border:1.5px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer}
 .btn:focus-visible{outline:3px solid var(--focus); outline-offset:2px}
 .btn.primary{background:var(--ink); color:var(--bg); border-color:var(--ink)}
-.btn.warn{border-color:#d2544a; color:#d2544a}
+.btn.warn{border-color:var(--bad); color:var(--bad)}
 .btn:disabled{opacity:.45; cursor:not-allowed}
 
 .parking{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px; display:flex; flex-direction:column; gap:8px; min-width:0}
@@ -87,23 +87,41 @@ h1{font-size:1.45rem; margin:0; letter-spacing:.01em}
 .parking .btn{padding:7px 12px; font-size:.9rem}
 .log{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px; min-width:0}
 .log h2{font-size:1rem; margin:0 0 8px}
-.logscroll{max-height:260px; overflow:auto}
-table{width:100%; border-collapse:collapse; font-size:.92rem}
-th{text-align:left; font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); padding:6px 8px; border-bottom:1px solid var(--line); position:sticky; top:0; background:var(--surface)}
-td{padding:7px 8px; border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums}
+.logscroll{max-height:380px; overflow:auto}
+.loghead{display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:6px 14px; margin-bottom:8px}
+.loghead h2{margin:0}
+.loghint{font-size:.85rem; color:var(--muted)}
+table{width:100%; min-width:720px; border-collapse:collapse; font-size:.92rem}
+th{text-align:left; font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); padding:6px 8px; border-bottom:1px solid var(--line); position:sticky; top:0; background:var(--surface); z-index:1}
+td{padding:6px 8px; border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums; vertical-align:middle}
 td.mono{font-family:var(--mono)}
-.pill{display:inline-flex; align-items:center; gap:6px; font-weight:700}
-.pill i{width:10px; height:10px; border-radius:50%; background:var(--mc)}
+td.num{color:var(--muted); width:2.5em}
 .empty{color:var(--muted); padding:10px 2px}
-td.note{width:45%; min-width:180px}
-td.note input{font:inherit; font-size:.9rem; color:var(--ink); background:transparent; width:100%; min-width:0;
-  border:1px dashed var(--line); border-radius:6px; padding:5px 8px}
-td.note input:hover{border-color:var(--muted)}
-td.note input:focus{outline:none; border-style:solid; border-color:var(--focus); background:var(--bg)}
+.tin,.msel,td.note input{font:inherit; font-size:.9rem; color:var(--ink); background:transparent; border:1px solid var(--line); border-radius:6px; padding:5px 7px; min-width:0}
+.tin{font-family:var(--mono); font-size:.85rem; width:12em}
+.msel{font-weight:700; cursor:pointer}
+.msel option{background:var(--surface); color:var(--ink); font-weight:400}
+.tin:hover,.msel:hover,td.note input:hover{border-color:var(--muted)}
+.tin:focus,.msel:focus,td.note input:focus{outline:none; border-color:var(--focus); background:var(--bg)}
+.tin.bad,.tin.bad:focus{border-color:var(--bad); background:color-mix(in srgb, var(--bad) 12%, transparent)}
+td.modecell{white-space:nowrap}
+td.modecell i{display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--mc); margin-right:6px; vertical-align:middle}
+td.note{width:40%; min-width:180px}
+td.note input{width:100%; border-style:dashed}
 td.note input:not(:placeholder-shown){border-style:solid}
 tr.live td{background:color-mix(in srgb, var(--mc) 9%, transparent)}
+tr.paused td.dur, tr.paused .msel{color:var(--muted)}
+td.rowact{white-space:nowrap; text-align:right; width:1%}
+.ib{font:inherit; font-weight:700; min-width:30px; height:30px; padding:0 8px; border-radius:7px; border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; margin-left:4px}
+.ib:hover{border-color:var(--muted)}
+.ib:focus-visible{outline:3px solid var(--focus); outline-offset:1px}
+.ib.del{color:var(--bad)}
+.ib.armed{background:var(--bad); border-color:var(--bad); color:#fff}
+#logmsg{font-size:.88rem; color:var(--muted); min-height:1.3em; margin-top:8px}
+#logmsg.bad{color:var(--bad); font-weight:700}
 .defs{font-size:.85rem; color:var(--muted); display:grid; gap:4px}
 .defs b{color:var(--ink)}
+.sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
 
 @media (max-width:1100px){
   .main{grid-template-columns:minmax(0,1fr) minmax(0,1fr); grid-template-areas:"wheel wheel" "side park"}
@@ -169,14 +187,15 @@ tr.live td{background:color-mix(in srgb, var(--mc) 9%, transparent)}
 
 
   <section class="log">
-    <h2>Segment log</h2>
-    <div class="logscroll"><table><thead><tr><th>#</th><th>Start</th><th>Mode</th><th>Duration</th><th>Note (optional)</th></tr></thead><tbody id="logbody"></tbody></table></div>
+    <div class="loghead"><h2>Segment log</h2><span class="loghint">Fix mistakes here: change a start time or mode, add a row with +, or delete with ×. Each row runs until the next row starts.</span></div>
+    <div class="logscroll"><table><thead><tr><th>#</th><th>Start</th><th>Mode</th><th>Duration</th><th>Note (optional)</th><th><span class="sr">Edit</span></th></tr></thead><tbody id="logbody"></tbody></table></div>
+    <div id="logmsg" role="status" aria-live="polite"></div>
   </section>
 
   <section class="defs">
     <div><b>On-task</b> includes everything that contributes to completing the task.</div>
     <div><b>Off-task</b> includes everything that causes a delay in completing the task, including unnecessary comments, questions, actions, and spontaneous breaks.</div>
-    <div><b>Break</b> is a planned pause. Keys: <b>1</b> on-task, <b>2</b> off-task, <b>3</b> break, <b>Space</b> pause. Tap the active mode again to pause.</div>
+    <div><b>Break</b> is a planned break. <b>Paused</b> rows stop the clock and are not counted. Keys: <b>1</b> on-task, <b>2</b> off-task, <b>3</b> break, <b>Space</b> pause. Tap the active mode again to pause.</div>
   </section>
 </div>
 
@@ -186,15 +205,35 @@ const MODES = [
   {id:'off', label:'Off task', key:'2'},
   {id:'brk', label:'Break',    key:'3'}
 ];
-const LABEL = Object.fromEntries(MODES.map(m=>[m.id,m.label]));
+const PZ = 'pz';
+const LABEL = Object.assign(Object.fromEntries(MODES.map(m=>[m.id,m.label])), {pz:'Paused'});
+const ALL_MODES = [...MODES.map(m=>m.id), PZ];
+const PZ_PDF = '#a3aab6';
 const STORE = 'task-time-tracker-v1';
 
 function todayStr(){ const d=new Date(); return d.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'}); }
-function fresh(){ return {date:todayStr(), tracker:'', task:'', scaleMin:60,
-  colors:{on:'#2e9a68', off:'#d2544a', brk:'#e3a23a'}, segs:[], mode:null, finished:false, parking:''}; }
+function fresh(){ return {v:2, date:todayStr(), tracker:'', task:'', scaleMin:60,
+  colors:{on:'#2e9a68', off:'#d2544a', brk:'#e3a23a'}, segs:[], end:null, finished:false, parking:''}; }
 function load(){ try{ const s=JSON.parse(localStorage.getItem(STORE)); if(s && s.segs) return s; }catch(e){} return null; }
 function save(){ try{ localStorage.setItem(STORE, JSON.stringify(S)); }catch(e){} }
-let S = load() || fresh();
+
+/* Data model: each row has a start time; it lasts until the next row starts.
+   The last row lasts until S.end (finished) or now (live). Paused rows are not counted. */
+function migrate(s){
+  if(s.v===2) return s;
+  const out=[]; const old=s.segs||[];
+  old.forEach((g,i)=>{
+    const prev=old[i-1];
+    if(prev && prev.e!=null && g.s-prev.e>=1000) out.push({m:PZ, s:prev.e});
+    out.push({m:g.m, s:g.s, note:g.note||''});
+  });
+  const last=old[old.length-1];
+  s.end=null;
+  if(last && last.e!=null){ if(s.finished) s.end=last.e; else out.push({m:PZ, s:last.e}); }
+  s.segs=out; s.v=2; delete s.mode;
+  return s;
+}
+let S = migrate(load() || fresh());
 if(typeof S.parking!=='string') S.parking='';
 
 /* ---------- helpers ---------- */
@@ -202,32 +241,87 @@ const $ = id => document.getElementById(id);
 function fmt(ms){ ms=Math.max(0,Math.floor(ms/1000)); const h=Math.floor(ms/3600), m=Math.floor(ms%3600/60), s=ms%60;
   return h+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); }
 function clock(t){ return new Date(t).toLocaleTimeString([], {hour:'numeric', minute:'2-digit', second:'2-digit'}); }
+function timeVal(t){ const d=new Date(t); return [d.getHours(),d.getMinutes(),d.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':'); }
+function segEnd(i, now){ return i < S.segs.length-1 ? S.segs[i+1].s : (S.end ?? now); }
+function segDur(i, now){ return Math.max(0, segEnd(i, now) - S.segs[i].s); }
+function curMode(){ if(S.finished || !S.segs.length) return null; const m=S.segs[S.segs.length-1].m; return m===PZ ? null : m; }
+function colorOf(m, pdf){ return m===PZ ? (pdf ? PZ_PDF : 'var(--pz)') : S.colors[m]; }
 function totals(now){
   const t={on:0,off:0,brk:0,total:0};
-  for(const g of S.segs){ const d=(g.e??now)-g.s; t[g.m]+=d; t.total+=d; }
+  S.segs.forEach((g,i)=>{ if(g.m===PZ) return; const d=segDur(i,now); t[g.m]+=d; t.total+=d; });
   return t;
 }
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function pct(a,b){ return b? Math.round(a/b*100)+'%' : '—'; }
 
-/* ---------- actions ---------- */
-function closeOpen(now){ const last=S.segs[S.segs.length-1]; if(last && last.e==null) last.e=now; }
+/* ---------- live actions ---------- */
+function pushRow(m, now){
+  const last=S.segs[S.segs.length-1];
+  if(last && last.m===m) return;
+  if(last && now-last.s<1000){ last.m=m; }          // switched within a second: just relabel
+  else S.segs.push({m, s:now, note:''});
+}
 function setMode(m){
   if(S.finished) return;
-  const now=Date.now(); closeOpen(now);
-  if(S.mode===m){ S.mode=null; }
-  else { S.segs.push({m, s:now, e:null}); S.mode=m; }
-  save(); renderStatic();
+  const now=Date.now(), cur=curMode();
+  const next = cur===m ? PZ : m;
+  if(!S.segs.length && next===PZ) return;
+  pushRow(next, now); save(); renderStatic(true);
 }
-function pause(){ if(S.finished||!S.mode) return; closeOpen(Date.now()); S.mode=null; save(); renderStatic(); }
-function finish(){ if(!S.segs.length) return; closeOpen(Date.now()); S.mode=null; S.finished=true; save(); renderStatic(); }
+function pause(){ if(S.finished || !curMode()) return; pushRow(PZ, Date.now()); save(); renderStatic(true); }
+function finish(){
+  if(!S.segs.length || S.finished) return;
+  const now=Date.now(), last=S.segs[S.segs.length-1];
+  if(last.m===PZ && S.segs.length>1){ S.end=last.s; S.segs.pop(); } else S.end=now;
+  S.finished=true; save(); renderStatic();
+}
 let resetArmed=null;
 function reset(){
   const b=$('b-reset');
   if(!resetArmed){ b.textContent='Tap again to clear'; resetArmed=setTimeout(()=>{resetArmed=null; b.textContent='Reset';},3000); return; }
   clearTimeout(resetArmed); resetArmed=null; b.textContent='Reset';
   const keep={colors:S.colors, scaleMin:S.scaleMin, tracker:S.tracker};
-  S=Object.assign(fresh(), keep); save(); syncFields(); renderStatic();
+  S=Object.assign(fresh(), keep); save(); syncFields(); renderStatic(); logMsg("");
+}
+
+/* ---------- log editing ---------- */
+function bounds(i){
+  const lo = i>0 ? S.segs[i-1].s : -Infinity;
+  const hi = i<S.segs.length-1 ? S.segs[i+1].s : (S.end ?? Date.now());
+  return {lo, hi};
+}
+function parseStart(i, val){
+  // val is "HH:MM" or "HH:MM:SS"; keep the row's calendar day, allow ±1 day for sessions across midnight
+  const p=String(val||'').split(':').map(Number);
+  if(p.length<2 || p.some(n=>Number.isNaN(n))) return null;
+  const d=new Date(S.segs[i].s); d.setHours(p[0], p[1], p[2]||0, 0);
+  const {lo,hi}=bounds(i);
+  for(const shift of [0, -86400000, 86400000]){ const t=d.getTime()+shift; if(t>=lo && t<=hi) return {t, ok:true}; }
+  return {t:d.getTime(), ok:false};
+}
+function rangeText(i){
+  const {lo,hi}=bounds(i);
+  const hiTxt = i<S.segs.length-1 ? clock(hi) : (S.end!=null ? clock(hi)+' (session end)' : clock(hi)+' (now)');
+  return lo===-Infinity ? `at or before ${hiTxt}` : `between ${clock(lo)} and ${hiTxt}`;
+}
+let msgTimer=null;
+function logMsg(text, bad){
+  const el=$('logmsg'); el.textContent=text; el.classList.toggle('bad',!!bad);
+  clearTimeout(msgTimer); if(text) msgTimer=setTimeout(()=>{ el.textContent=''; },6000);
+}
+function insertAfter(i){
+  const now=Date.now(), a=S.segs[i].s, b=segEnd(i, now);
+  const s=Math.floor((a+b)/2000)*1000;
+  const m = S.segs[i].m==='on' ? 'off' : 'on';
+  S.segs.splice(i+1, 0, {m, s:Math.max(a, Math.min(s, b)), note:''});
+  save(); renderStatic();
+  const t=$('t-'+(i+1)); if(t){ t.focus(); }
+  logMsg(`Row ${i+2} added. Set its start time ${rangeText(i+1)}, then pick the mode.`);
+}
+function deleteRow(i){
+  S.segs.splice(i,1);
+  if(!S.segs.length){ S.end=null; S.finished=false; }
+  save(); renderStatic(); logMsg(`Row ${i+1} deleted. The row before it now runs until the next start time.`);
 }
 
 /* ---------- build mode buttons ---------- */
@@ -254,24 +348,35 @@ for(const [id,key] of [['f-date','date'],['f-tracker','tracker'],['f-task','task
 $('f-scale').addEventListener('change',e=>{ S.scaleMin=+e.target.value; save(); });
 
 /* ---------- render (static parts) ---------- */
-function renderStatic(){
+function renderStatic(scrollToEnd){
+  const cur=curMode();
   for(const m of MODES){
     const row=$('mode-'+m.id); row.style.setProperty('--mc',S.colors[m.id]);
-    row.classList.toggle('active',S.mode===m.id);
+    row.classList.toggle('active',cur===m.id);
     row.classList.toggle('disabled',S.finished);
   }
-  $('b-pause').disabled = !S.mode;
+  $('b-pause').disabled = !cur;
   $('b-finish').disabled = S.finished || !S.segs.length;
-  // log
+
   const tb=$('logbody');
-  if(!S.segs.length){ tb.innerHTML='<tr><td colspan="5" class="empty">No segments yet. Press On task, Off task or Break to begin.</td></tr>'; }
+  if(!S.segs.length){ tb.innerHTML='<tr><td colspan="6" class="empty">No segments yet. Press On task, Off task or Break to begin.</td></tr>'; }
   else{
-    const focusedId = document.activeElement && document.activeElement.id;
-    const caret = focusedId && focusedId.startsWith('n-') ? document.activeElement.selectionStart : null;
-    tb.innerHTML = S.segs.map((g,i)=>`<tr data-i="${i}" class="${g.e==null?'live':''}" style="--mc:${S.colors[g.m]}"><td>${i+1}</td><td class="mono">${clock(g.s)}</td>
-      <td><span class="pill"><i></i>${LABEL[g.m]}</span></td><td class="mono dur"></td>
-      <td class="note"><input id="n-${i}" data-i="${i}" type="text" placeholder="Add a note" value="${esc(g.note||'')}" aria-label="Note for segment ${i+1}" autocomplete="off"></td></tr>`).reverse().join('');
-    if(caret!=null && $(focusedId)){ const el=$(focusedId); el.focus(); el.setSelectionRange(caret,caret); }
+    const ae=document.activeElement, fid=ae && ae.id && tb.contains(ae) ? ae.id : null;
+    const caret = fid && fid.startsWith('n-') ? ae.selectionStart : null;
+    const lastLive = !S.finished;
+    tb.innerHTML = S.segs.map((g,i)=>{
+      const live = lastLive && i===S.segs.length-1;
+      const opts = ALL_MODES.map(id=>`<option value="${id}"${id===g.m?' selected':''}>${LABEL[id]}</option>`).join('');
+      return `<tr data-i="${i}" class="${live?'live':''}${g.m===PZ?' paused':''}" style="--mc:${colorOf(g.m)}">
+        <td class="num">${i+1}</td>
+        <td><input class="tin" id="t-${i}" data-i="${i}" type="time" step="1" value="${timeVal(g.s)}" aria-label="Start time for row ${i+1}"></td>
+        <td class="modecell"><i></i><select class="msel" id="m-${i}" data-i="${i}" aria-label="Mode for row ${i+1}">${opts}</select></td>
+        <td class="mono dur"></td>
+        <td class="note"><input id="n-${i}" data-i="${i}" type="text" placeholder="Add a note" value="${esc(g.note||'')}" aria-label="Note for row ${i+1}" autocomplete="off"></td>
+        <td class="rowact"><button type="button" class="ib" data-act="ins" data-i="${i}" title="Insert a row after row ${i+1}" aria-label="Insert a row after row ${i+1}">+</button><button type="button" class="ib del" data-act="del" data-i="${i}" title="Delete row ${i+1}" aria-label="Delete row ${i+1}">×</button></td>
+      </tr>`;}).join('');
+    if(fid && $(fid)){ const el=$(fid); el.focus(); if(caret!=null) el.setSelectionRange(caret,caret); }
+    if(scrollToEnd){ const sc=document.querySelector('.logscroll'); sc.scrollTop=sc.scrollHeight; }
   }
   tick();
 }
@@ -281,7 +386,7 @@ function drawWheel(ctx, size, pal, now){
   const c=size/2, L=S.scaleMin*60000;
   const tot=totals(now).total;
   const laps=Math.max(1, Math.ceil(tot/L) || 1);
-  const R = size/2 - size*0.075;              // outer ring radius (room for labels)
+  const R = size/2 - size*0.075;
   const usable = R*0.58;
   const w = Math.min(size*0.085, usable/laps*0.82);
   const gap = Math.min(size*0.012, usable/laps*0.18);
@@ -291,14 +396,13 @@ function drawWheel(ctx, size, pal, now){
   ctx.clearRect(0,0,size,size);
   if(pal.bg){ ctx.fillStyle=pal.bg; ctx.fillRect(0,0,size,size); }
 
-  // tracks
   ctx.lineCap='butt';
   for(let k=0;k<laps;k++){ ctx.beginPath(); ctx.strokeStyle=pal.track; ctx.lineWidth=w; ctx.arc(c,c,ringR(k),0,Math.PI*2); ctx.stroke(); }
 
-  // segments
   let cum=0;
-  for(const g of S.segs){
-    const d=(g.e??now)-g.s; let a=cum, b=cum+d; cum=b;
+  S.segs.forEach((g,i)=>{
+    if(g.m===PZ) return;
+    const d=segDur(i,now); let a=cum, b=cum+d; cum=b;
     while(a<b){
       const k=Math.floor(a/L), lapEnd=(k+1)*L, pieceEnd=Math.min(b,lapEnd);
       ctx.beginPath(); ctx.strokeStyle=S.colors[g.m]; ctx.lineWidth=w;
@@ -306,9 +410,8 @@ function drawWheel(ctx, size, pal, now){
       ctx.arc(c,c,ringR(k),a0,a1+0.002); ctx.stroke();
       a=pieceEnd;
     }
-  }
+  });
 
-  // 60 interval ticks + labels
   const tickOuter=R+size*0.02;
   for(let i=0;i<60;i++){
     const t=-Math.PI/2+i/60*Math.PI*2, major=i%5===0;
@@ -324,18 +427,17 @@ function drawWheel(ctx, size, pal, now){
     }
   }
 
-  // now marker
   if(tot>0){
     const k=Math.min(laps-1, Math.floor(tot/L)), t=ang(tot), rr=ringR(k);
     ctx.beginPath(); ctx.fillStyle=pal.ink;
     ctx.arc(c+Math.cos(t)*rr, c+Math.sin(t)*rr, w*0.22, 0, Math.PI*2); ctx.fill();
   }
 
-  // center readout
   const inner = ringR(laps-1) - w/2;
   ctx.textAlign='center'; ctx.textBaseline='middle';
-  const cur = S.mode ? LABEL[S.mode] : (S.finished ? 'Complete' : (S.segs.length ? 'Paused' : 'Ready'));
-  ctx.fillStyle = S.mode ? S.colors[S.mode] : pal.muted;
+  const cm=curMode();
+  const cur = cm ? LABEL[cm] : (S.finished ? 'Complete' : (S.segs.length ? 'Paused' : 'Ready'));
+  ctx.fillStyle = cm ? S.colors[cm] : pal.muted;
   ctx.font=`700 ${Math.round(Math.min(size*0.05, inner*0.24))}px ${pal.sans}`;
   ctx.fillText(cur, c, c-inner*0.32);
   ctx.fillStyle=pal.ink;
@@ -359,17 +461,14 @@ function sizeCanvas(){ const r=cv.getBoundingClientRect(), dpr=window.devicePixe
 function tick(){
   const now=Date.now(), t=totals(now);
   drawWheel(cx, cv.width, screenPalette(), now);
-  // totals panel
   const rows=[['on','On task'],['off','Off task'],['brk','Break']];
   $('totals').innerHTML =
     `<div class="trow total"><span class="sw"></span><span class="nm">Total time</span><span class="tm">${fmt(t.total)}</span><span class="pc">100%</span></div>` +
     rows.map(([k,l])=>`<div class="trow" style="--mc:${S.colors[k]}"><span class="sw"></span><span class="nm">${l}</span><span class="tm">${fmt(t[k])}</span><span class="pc">${t.total?pct(t[k],t.total):'—'}</span></div>`).join('');
-  // log durations
-  document.querySelectorAll('#logbody tr[data-i]').forEach(tr=>{ const g=S.segs[+tr.dataset.i]; tr.querySelector('.dur').textContent=fmt((g.e??now)-g.s); });
-  // status line
-  const st=$('status');
-  if(S.finished){ const a=S.segs[0].s, b=S.segs[S.segs.length-1].e; st.innerHTML=`<b>Session complete</b> · ${clock(a)} – ${clock(b)}`; }
-  else if(S.mode) st.innerHTML=`Recording <b>${LABEL[S.mode]}</b> · started ${clock(S.segs[0].s)}`;
+  document.querySelectorAll('#logbody tr[data-i]').forEach(tr=>{ const i=+tr.dataset.i; if(S.segs[i]) tr.querySelector('.dur').textContent=fmt(segDur(i,now)); });
+  const st=$('status'), cm=curMode();
+  if(S.finished && S.segs.length) st.innerHTML=`<b>Session complete</b> · ${clock(S.segs[0].s)} – ${clock(S.end)}`;
+  else if(cm) st.innerHTML=`Recording <b>${LABEL[cm]}</b> · started ${clock(S.segs[0].s)}`;
   else if(S.segs.length) st.innerHTML='<b>Paused</b> · press a mode to continue';
   else st.textContent='Ready. Press a mode to start.';
 }
@@ -391,7 +490,7 @@ function exportPDF(){
   doc.text('On-Task / Off-Task Time Record', M, y+12); y+=36;
 
   const startT = S.segs.length ? clock(S.segs[0].s) : '—';
-  const endT = S.segs.length ? (S.segs[S.segs.length-1].e ? clock(S.segs[S.segs.length-1].e) : 'in progress') : '—';
+  const endT = S.segs.length ? (S.end!=null ? clock(S.end) : 'in progress') : '—';
   const fieldLine=(label,val,x,yy,wid)=>{
     doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor('#636b7a'); doc.text(label+':', x, yy);
     const lw=doc.getTextWidth(label+': ');
@@ -404,14 +503,12 @@ function exportPDF(){
   fieldLine('Task', S.task, M, y, W-2*M); y+=24;
   fieldLine('Time', `${startT} – ${endT}`, M, y, half); fieldLine('Wheel lap', `${S.scaleMin} min`, M+half+20, y, half); y+=24;
 
-  // wheel image
   const off=document.createElement('canvas'); off.width=off.height=1100;
   drawWheel(off.getContext('2d'), 1100, {ink:'#1d2330', muted:'#636b7a', track:'#e8ebf0', bg:'#ffffff',
     sans:'"Atkinson Hyperlegible", Helvetica, Arial, sans-serif', mono:'"JetBrains Mono", Courier, monospace'}, now);
   const wSize=280;
   doc.addImage(off.toDataURL('image/png'), 'PNG', M-6, y, wSize, wSize);
 
-  // totals table
   let tx=M+wSize+18, ty=y+40;
   const rowsT=[['Total time','#1d2330',t.total,'100%'],['On task',S.colors.on,t.on,pct(t.on,t.total)],
                ['Off task',S.colors.off,t.off,pct(t.off,t.total)],['Break',S.colors.brk,t.brk,pct(t.brk,t.total)]];
@@ -425,18 +522,17 @@ function exportPDF(){
     doc.setDrawColor('#dde1e8'); doc.line(tx, ty+9, W-M, ty+9);
     ty+=30;
   });
+  const counted=S.segs.filter(g=>g.m!==PZ).length, paused=S.segs.length-counted;
   doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor('#636b7a');
-  doc.text(`${S.segs.length} segment${S.segs.length===1?'':'s'} recorded`, tx, ty+4);
+  doc.text(`${counted} segment${counted===1?'':'s'} recorded${paused?` · ${paused} pause${paused===1?'':'s'} (not counted)`:''}`, tx, ty+4);
 
   y+=wSize+18;
-  // definitions
   doc.setFontSize(9); doc.setTextColor('#636b7a');
   const defs=['On-task: includes everything that contributes to completing the task.',
     'Off-task: includes everything that causes a delay in completing the task, including unnecessary comments, questions, actions, and spontaneous breaks.'];
   defs.forEach(d=>{ const lines=doc.splitTextToSize(d, W-2*M); doc.text(lines, M, y); y+=lines.length*11+3; });
   y+=10;
 
-  // parking lot
   doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor('#1d2330'); doc.text('Parking lot', M, y); y+=8;
   const pText = S.parking.trim();
   doc.setFont('helvetica', pText?'normal':'italic'); doc.setFontSize(10);
@@ -452,7 +548,6 @@ function exportPDF(){
   y+=20;
   if(y>720){ doc.addPage(); y=M; }
 
-  // segment log
   const head=()=>{ doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor('#636b7a');
     doc.text('#',M,y); doc.text('START',M+24,y); doc.text('MODE',M+108,y); doc.text('DURATION',M+188,y); doc.text('NOTE',M+262,y);
     doc.setDrawColor('#dde1e8'); doc.line(M,y+5,W-M,y+5); y+=18; };
@@ -464,10 +559,11 @@ function exportPDF(){
     const nLines = (g.note||'').trim() ? doc.splitTextToSize(g.note.trim(), noteW) : [];
     const rowH = Math.max(16, nLines.length*12+4);
     if(y+rowH-12>760){ doc.addPage(); y=M; head(); }
-    doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor('#1d2330');
+    const ink = g.m===PZ ? '#8a92a0' : '#1d2330';
+    doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(ink);
     doc.text(String(i+1), M, y); doc.text(clock(g.s), M+24, y);
-    doc.setFillColor(S.colors[g.m]); doc.circle(M+111, y-3.5, 3.5, 'F'); doc.text(LABEL[g.m], M+119, y);
-    doc.setFont('courier','normal'); doc.text(fmt((g.e??now)-g.s), M+188, y);
+    doc.setFillColor(colorOf(g.m,true)); doc.circle(M+111, y-3.5, 3.5, 'F'); doc.text(LABEL[g.m], M+119, y);
+    doc.setFont('courier','normal'); doc.text(fmt(segDur(i,now)), M+188, y);
     if(nLines.length){ doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor('#3a4150'); doc.text(nLines, M+262, y); }
     y+=rowH;
   });
@@ -483,11 +579,45 @@ $('b-pause').addEventListener('click',pause);
 $('b-finish').addEventListener('click',finish);
 $('b-reset').addEventListener('click',reset);
 $('b-pdf').addEventListener('click',exportPDF);
-$('logbody').addEventListener('input',e=>{
-  const i=e.target.dataset.i; if(i==null || !S.segs[+i]) return;
-  S.segs[+i].note=e.target.value; save();
+
+const LB=$('logbody');
+LB.addEventListener('input',e=>{
+  const el=e.target, i=+el.dataset.i; if(Number.isNaN(i) || !S.segs[i]) return;
+  if(el.id.startsWith('n-')){ S.segs[i].note=el.value; save(); return; }
+  if(el.classList.contains('tin')){
+    const r=parseStart(i, el.value);
+    const bad = !r || !r.ok;
+    el.classList.toggle('bad', bad);
+    el.setCustomValidity(bad ? `Start time must be ${rangeText(i)}.` : '');
+    if(bad) logMsg(`Row ${i+1}: start time must be ${rangeText(i)}.`, true); else logMsg('');
+  }
 });
-$('logbody').addEventListener('keydown',e=>{ if(e.key==='Enter' && e.target.matches('input')) e.target.blur(); });
+LB.addEventListener('focusout',e=>{
+  const el=e.target; if(!el.classList || !el.classList.contains('tin')) return;
+  const i=+el.dataset.i; if(!S.segs[i]) return;
+  const r=parseStart(i, el.value);
+  if(r && r.ok){
+    if(r.t!==S.segs[i].s){ S.segs[i].s=r.t; save(); setTimeout(()=>renderStatic(),0); logMsg(`Row ${i+1} now starts at ${clock(r.t)}. Durations updated.`); }
+  } else {
+    el.value=timeVal(S.segs[i].s); el.classList.remove('bad'); el.setCustomValidity('');
+    logMsg(`Row ${i+1} not changed. The start time must be ${rangeText(i)}.`, true);
+  }
+});
+LB.addEventListener('change',e=>{
+  const el=e.target; if(!el.classList.contains('msel')) return;
+  const i=+el.dataset.i; if(!S.segs[i]) return;
+  S.segs[i].m=el.value; save(); renderStatic();
+});
+LB.addEventListener('click',e=>{
+  const b=e.target.closest('button[data-act]'); if(!b) return;
+  const i=+b.dataset.i;
+  if(b.dataset.act==='ins'){ insertAfter(i); return; }
+  if(b.dataset.armed){ deleteRow(i); return; }
+  b.dataset.armed='1'; b.textContent='Delete?'; b.classList.add('armed');
+  setTimeout(()=>{ if(b.isConnected){ delete b.dataset.armed; b.textContent='×'; b.classList.remove('armed'); } },3000);
+});
+LB.addEventListener('keydown',e=>{ if(e.key==='Enter' && e.target.matches('input')) e.target.blur(); });
+
 $('b-stamp').addEventListener('click',()=>{
   const ta=$('f-parking'), stamp=new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'})+' ';
   const pos=ta.selectionStart ?? ta.value.length;
@@ -505,7 +635,7 @@ document.addEventListener('keydown',e=>{
 });
 window.addEventListener('resize',()=>{ sizeCanvas(); tick(); });
 matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',tick);
-sizeCanvas(); renderStatic(); loop();
+sizeCanvas(); save(); renderStatic(true); loop();
 if(document.fonts) document.fonts.ready.then(tick);
 </script>
 </body>
