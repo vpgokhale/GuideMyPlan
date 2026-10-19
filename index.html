@@ -55,10 +55,25 @@ h1{font-size:1.45rem; margin:0; letter-spacing:.01em}
 .mode.active .dot{background:#fff; box-shadow:0 0 0 0 rgba(255,255,255,.7); animation:pulse 1.4s infinite}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,255,255,.7)}70%{box-shadow:0 0 0 9px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
 @media (prefers-reduced-motion:reduce){.mode.active .dot{animation:none}}
-.swatch{display:flex; align-items:center; gap:6px; padding:0 12px; border-left:1px solid var(--line); font-size:.72rem; color:var(--muted)}
-.mode.active .swatch{color:#fff; border-left-color:rgba(255,255,255,.4)}
-.swatch input{width:34px; height:34px; border:0; padding:0; background:none; cursor:pointer}
+.mode{grid-template-columns:1fr}
+.mode .lbltxt{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .mode.disabled{opacity:.45; pointer-events:none}
+.mode.editing{grid-template-columns:auto minmax(0,1fr) auto auto; align-items:center; gap:10px; padding:8px 10px; border-style:dashed}
+.mode.editing .key{margin-left:0}
+.mode.editing .nokey{opacity:.6}
+.cpick{display:grid; place-items:center; width:38px; height:38px; border-radius:50%; overflow:hidden; border:2px solid var(--line); cursor:pointer; background:var(--mc)}
+.cpick input{width:56px; height:56px; border:0; padding:0; opacity:0; cursor:pointer}
+.cpick:focus-within{outline:3px solid var(--focus); outline-offset:2px}
+.mode .lbl{font:inherit; font-size:1.05rem; font-weight:700; color:var(--ink); background:var(--bg); border:1.5px solid var(--line); border-radius:8px; padding:8px 10px; width:100%; min-width:0}
+.mode .lbl:focus{outline:none; border-color:var(--focus)}
+.modetools{display:flex; flex-wrap:wrap; justify-content:flex-end; gap:8px}
+.btn.small{padding:7px 12px; font-size:.9rem}
+.btn.ghost{border-color:transparent; color:var(--muted); background:transparent}
+.btn.ghost:hover{color:var(--ink); border-color:var(--line)}
+#modemsg{font-size:.88rem; color:var(--muted); min-height:0}
+#modemsg:empty{display:none}
+#modemsg.bad{color:var(--bad); font-weight:700}
+.trow .nm small{color:var(--muted); font-weight:400}
 
 .totals{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:6px 14px}
 .trow{display:grid; grid-template-columns:auto 1fr auto auto; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--line)}
@@ -119,8 +134,23 @@ td.rowact{white-space:nowrap; text-align:right; width:1%}
 .ib.armed{background:var(--bad); border-color:var(--bad); color:#fff}
 #logmsg{font-size:.88rem; color:var(--muted); min-height:1.3em; margin-top:8px}
 #logmsg.bad{color:var(--bad); font-weight:700}
-.defs{font-size:.85rem; color:var(--muted); display:grid; gap:4px}
-.defs b{color:var(--ink)}
+.legend{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px; min-width:0}
+.legend h2{font-size:1rem; margin:0}
+#legend{display:grid}
+.lrow{display:grid; grid-template-columns:minmax(9em, 14em) minmax(0,1fr); gap:6px 14px; align-items:start; padding:8px 0; border-bottom:1px solid var(--line)}
+.lname{display:flex; align-items:center; gap:8px; min-width:0; padding-top:6px}
+.lname i{width:12px; height:12px; border-radius:50%; background:var(--mc); flex:none}
+.lname b{min-width:0; overflow-wrap:anywhere}
+.lname .key{margin-left:auto}
+.ldesc{font:inherit; font-size:.92rem; line-height:1.45; color:var(--ink); background:transparent; border:1px solid transparent; border-radius:8px; padding:5px 8px; width:100%; resize:none; overflow:hidden; min-width:0}
+.ldesc::placeholder{color:var(--muted); font-style:italic}
+.ldesc:placeholder-shown{border:1px dashed var(--line)}
+.ldesc:hover{border-color:var(--muted)}
+.ldesc:focus{outline:none; border-color:var(--focus); background:var(--bg)}
+.legend-foot{font-size:.85rem; color:var(--muted); padding-top:10px}
+.legend-foot b{color:var(--ink)}
+.lname .key, .mode .key{font-family:var(--mono); font-size:.75rem; color:var(--muted); border:1px solid var(--line); border-radius:5px; padding:1px 6px}
+@media (max-width:560px){ .lrow{grid-template-columns:1fr} .lname .key{margin-left:6px} }
 .sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
 
 @media (max-width:1100px){
@@ -135,7 +165,7 @@ td.rowact{white-space:nowrap; text-align:right; width:1%}
 }
 @media (max-width:440px){ .fields{grid-template-columns:1fr} }
 @media print{
-  .actions,.swatch,.key{display:none!important}
+  .actions,.modetools,.key{display:none!important}
   body{background:#fff}
 }
 </style>
@@ -164,6 +194,7 @@ td.rowact{white-space:nowrap; text-align:right; width:1%}
 
     <div class="side">
       <div class="modes" id="modes"></div>
+      <div id="modemsg" role="status" aria-live="polite"></div>
 
       <div class="totals" id="totals"></div>
 
@@ -192,28 +223,29 @@ td.rowact{white-space:nowrap; text-align:right; width:1%}
     <div id="logmsg" role="status" aria-live="polite"></div>
   </section>
 
-  <section class="defs">
-    <div><b>On-task</b> includes everything that contributes to completing the task.</div>
-    <div><b>Off-task</b> includes everything that causes a delay in completing the task, including unnecessary comments, questions, actions, and spontaneous breaks.</div>
-    <div><b>Break</b> is a planned break. <b>Paused</b> rows stop the clock and are not counted. Keys: <b>1</b> on-task, <b>2</b> off-task, <b>3</b> break, <b>Space</b> pause. Tap the active mode again to pause.</div>
+  <section class="legend" aria-labelledby="legend-h">
+    <div class="loghead"><h2 id="legend-h">Button key</h2><span class="loghint">Matches the buttons above. Click a description to edit it.</span></div>
+    <div id="legend"></div>
+    <div class="legend-foot"><b>Paused</b> rows stop the clock and are not counted. Press a button's number key to switch, <b>Space</b> to pause, or tap the active button again to pause.</div>
   </section>
 </div>
 
 <script>
-const MODES = [
-  {id:'on',  label:'On task',  key:'1'},
-  {id:'off', label:'Off task', key:'2'},
-  {id:'brk', label:'Break',    key:'3'}
-];
 const PZ = 'pz';
-const LABEL = Object.assign(Object.fromEntries(MODES.map(m=>[m.id,m.label])), {pz:'Paused'});
-const ALL_MODES = [...MODES.map(m=>m.id), PZ];
+const DEFAULT_MODES = [
+  {id:'on',  label:'On task',  color:'#2e9a68', desc:'Includes everything that contributes to completing the task.'},
+  {id:'off', label:'Off task', color:'#d2544a', desc:'Includes everything that causes a delay in completing the task, including unnecessary comments, questions, actions, and spontaneous breaks.'},
+  {id:'brk', label:'Break',    color:'#e3a23a', desc:'A planned break.'}
+];
+const DESC_PH = '<Enter description>';
+const NEW_COLORS = ['#3b7dd8','#8a5cc7','#d9668f','#2aa3a3','#7a8f2e','#c76b2e','#5b6bd6','#b0475e','#4f8a5b'];
+const MAX_MODES = 9;
 const PZ_PDF = '#a3aab6';
 const STORE = 'task-time-tracker-v1';
 
 function todayStr(){ const d=new Date(); return d.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'}); }
 function fresh(){ return {v:2, date:todayStr(), tracker:'', task:'', scaleMin:60,
-  colors:{on:'#2e9a68', off:'#d2544a', brk:'#e3a23a'}, segs:[], end:null, finished:false, parking:''}; }
+  modes:DEFAULT_MODES.map(m=>({...m})), segs:[], end:null, finished:false, parking:''}; }
 function load(){ try{ const s=JSON.parse(localStorage.getItem(STORE)); if(s && s.segs) return s; }catch(e){} return null; }
 function save(){ try{ localStorage.setItem(STORE, JSON.stringify(S)); }catch(e){} }
 
@@ -235,6 +267,13 @@ function migrate(s){
 }
 let S = migrate(load() || fresh());
 if(typeof S.parking!=='string') S.parking='';
+if(!Array.isArray(S.modes)){
+  S.modes = DEFAULT_MODES.map(m=>({...m, color:(S.colors && S.colors[m.id]) || m.color}));
+  delete S.colors;
+}
+S.modes.forEach(m=>{ if(typeof m.desc!=='string'){ const d=DEFAULT_MODES.find(x=>x.id===m.id && x.label===m.label); m.desc = d ? d.desc : ''; } });
+if(!S.segs.length) S.date = todayStr();     // a new (unstarted) session always opens on today's date
+let editing = false;
 
 /* ---------- helpers ---------- */
 const $ = id => document.getElementById(id);
@@ -245,10 +284,16 @@ function timeVal(t){ const d=new Date(t); return [d.getHours(),d.getMinutes(),d.
 function segEnd(i, now){ return i < S.segs.length-1 ? S.segs[i+1].s : (S.end ?? now); }
 function segDur(i, now){ return Math.max(0, segEnd(i, now) - S.segs[i].s); }
 function curMode(){ if(S.finished || !S.segs.length) return null; const m=S.segs[S.segs.length-1].m; return m===PZ ? null : m; }
-function colorOf(m, pdf){ return m===PZ ? (pdf ? PZ_PDF : 'var(--pz)') : S.colors[m]; }
+function visibleModes(){ return S.modes.filter(m=>!m.hidden); }
+function modeById(id){ return S.modes.find(m=>m.id===id); }
+function labelOf(id){ if(id===PZ) return 'Paused'; const m=modeById(id); return m ? (m.label.trim() || 'Untitled') : 'Unknown'; }
+function colorOf(id, pdf){ if(id===PZ) return pdf ? PZ_PDF : 'var(--pz)'; const m=modeById(id); return m ? m.color : '#888888'; }
+function keyOf(id){ const i=visibleModes().findIndex(m=>m.id===id); return i>=0 && i<9 ? String(i+1) : ''; }
+function shownModes(t){ return S.modes.filter(m=>!m.hidden || (t && t[m.id]>0)); }   // removed buttons still show if they have time
+function purgeModes(){ S.modes = S.modes.filter(m=>!m.hidden || S.segs.some(g=>g.m===m.id)); }
 function totals(now){
-  const t={on:0,off:0,brk:0,total:0};
-  S.segs.forEach((g,i)=>{ if(g.m===PZ) return; const d=segDur(i,now); t[g.m]+=d; t.total+=d; });
+  const t={total:0}; S.modes.forEach(m=>t[m.id]=0);
+  S.segs.forEach((g,i)=>{ if(g.m===PZ) return; const d=segDur(i,now); t[g.m]=(t[g.m]||0)+d; t.total+=d; });
   return t;
 }
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -266,6 +311,7 @@ function setMode(m){
   const now=Date.now(), cur=curMode();
   const next = cur===m ? PZ : m;
   if(!S.segs.length && next===PZ) return;
+  if(!S.segs.length && !S.date.trim()){ S.date=todayStr(); $('f-date').value=S.date; }
   pushRow(next, now); save(); renderStatic(true);
 }
 function pause(){ if(S.finished || !curMode()) return; pushRow(PZ, Date.now()); save(); renderStatic(true); }
@@ -280,7 +326,7 @@ function reset(){
   const b=$('b-reset');
   if(!resetArmed){ b.textContent='Tap again to clear'; resetArmed=setTimeout(()=>{resetArmed=null; b.textContent='Reset';},3000); return; }
   clearTimeout(resetArmed); resetArmed=null; b.textContent='Reset';
-  const keep={colors:S.colors, scaleMin:S.scaleMin, tracker:S.tracker};
+  const keep={modes:visibleModes(), scaleMin:S.scaleMin, tracker:S.tracker};
   S=Object.assign(fresh(), keep); save(); syncFields(); renderStatic(); logMsg("");
 }
 
@@ -312,7 +358,8 @@ function logMsg(text, bad){
 function insertAfter(i){
   const now=Date.now(), a=S.segs[i].s, b=segEnd(i, now);
   const s=Math.floor((a+b)/2000)*1000;
-  const m = S.segs[i].m==='on' ? 'off' : 'on';
+  const vm=visibleModes(), alt=vm.find(x=>x.id!==S.segs[i].m) || vm[0];
+  const m = alt ? alt.id : S.segs[i].m;
   S.segs.splice(i+1, 0, {m, s:Math.max(a, Math.min(s, b)), note:''});
   save(); renderStatic();
   const t=$('t-'+(i+1)); if(t){ t.focus(); }
@@ -324,24 +371,92 @@ function deleteRow(i){
   save(); renderStatic(); logMsg(`Row ${i+1} deleted. The row before it now runs until the next start time.`);
 }
 
-/* ---------- build mode buttons ---------- */
+/* ---------- mode buttons (editable) ---------- */
+let modeMsgTimer=null;
+function modeMsg(text, bad){
+  const el=$('modemsg'); el.textContent=text; el.classList.toggle('bad',!!bad);
+  clearTimeout(modeMsgTimer); if(text) modeMsgTimer=setTimeout(()=>{ el.textContent=''; },6000);
+}
 function buildModes(){
   const box=$('modes'); box.innerHTML='';
-  for(const m of MODES){
-    const row=document.createElement('div'); row.className='mode'; row.id='mode-'+m.id;
-    row.innerHTML=`<button class="go" id="go-${m.id}"><span class="dot"></span>${m.label}<span class="key">${m.key}</span></button>
-      <label class="swatch" title="Choose ${m.label} color">Color<input type="color" id="c-${m.id}" aria-label="${m.label} color"></label>`;
+  const vm=visibleModes();
+  vm.forEach(m=>{
+    const k=keyOf(m.id);
+    const row=document.createElement('div'); row.className='mode'+(editing?' editing':''); row.id='mode-'+m.id;
+    row.style.setProperty('--mc', m.color);
+    if(!editing){
+      row.innerHTML=`<button class="go" id="go-${m.id}"><span class="dot"></span><span class="lbltxt">${esc(labelOf(m.id))}</span>${k?`<span class="key">${k}</span>`:''}</button>`;
+      row.querySelector('.go').addEventListener('click',()=>setMode(m.id));
+    } else {
+      row.innerHTML=`<label class="cpick" title="Choose color"><input type="color" id="c-${m.id}" value="${m.color}" aria-label="Color for ${esc(labelOf(m.id))}"></label>
+        <input class="lbl" id="l-${m.id}" type="text" maxlength="24" value="${esc(m.label)}" aria-label="Button name" autocomplete="off">
+        ${k?`<span class="key">${k}</span>`:'<span class="key nokey" title="Only the first 9 buttons get keys">–</span>'}
+        <button type="button" class="ib del" id="x-${m.id}" title="Remove this button" aria-label="Remove ${esc(labelOf(m.id))}">×</button>`;
+      row.querySelector('input[type=color]').addEventListener('input',e=>{ m.color=e.target.value; row.style.setProperty('--mc',m.color); save(); renderStatic(); });
+      const li=row.querySelector('.lbl');
+      li.addEventListener('focus',()=>{ li.dataset.orig=m.label; });
+      li.addEventListener('input',e=>{ m.label=e.target.value; save(); renderStatic(); renderLegend(); });
+      li.addEventListener('blur',e=>{
+        if(!m.label.trim()){ m.label='Mode '+(vm.indexOf(m)+1); e.target.value=m.label; }
+        if(li.dataset.orig!==undefined && m.label.trim()!==li.dataset.orig.trim() && m.desc){
+          m.desc=''; modeMsg(`"${labelOf(m.id)}" renamed. Its description in the key below was cleared so you can write a new one.`);
+        }
+        delete li.dataset.orig; save(); renderStatic(); renderLegend();
+      });
+      li.addEventListener('keydown',e=>{ if(e.key==='Enter') e.target.blur(); });
+      const xb=row.querySelector('.del');
+      xb.addEventListener('click',()=>{
+        if(!xb.dataset.armed){ xb.dataset.armed='1'; xb.textContent='Remove?'; xb.classList.add('armed');
+          setTimeout(()=>{ if(xb.isConnected){ delete xb.dataset.armed; xb.textContent='×'; xb.classList.remove('armed'); } },3000); return; }
+        removeMode(m.id);
+      });
+    }
     box.appendChild(row);
-    row.querySelector('.go').addEventListener('click',()=>setMode(m.id));
-    const ci=row.querySelector('input'); ci.value=S.colors[m.id];
-    ci.addEventListener('input',e=>{ S.colors[m.id]=e.target.value; save(); renderStatic(); });
-  }
+  });
+  const tools=document.createElement('div'); tools.className='modetools';
+  tools.innerHTML = editing
+    ? `<button type="button" class="btn small" id="b-addmode"${vm.length>=MAX_MODES?' disabled':''}>+ Add button</button><button type="button" class="btn small primary" id="b-editmodes">Done</button>`
+    : `<button type="button" class="btn small ghost" id="b-editmodes">Edit buttons</button>`;
+  box.appendChild(tools);
+  $('b-editmodes').addEventListener('click',()=>{ editing=!editing; buildModes(); renderStatic(); modeMsg(editing?'Rename, recolor, add or remove buttons. Keys renumber automatically.':''); });
+  if(editing) $('b-addmode').addEventListener('click',addMode);
+  renderLegend();
+}
+function addMode(){
+  const vm=visibleModes(); if(vm.length>=MAX_MODES){ modeMsg(`You can have up to ${MAX_MODES} buttons.`, true); return; }
+  const used=new Set(S.modes.map(m=>m.color.toLowerCase()));
+  const color=NEW_COLORS.find(c=>!used.has(c)) || NEW_COLORS[S.modes.length % NEW_COLORS.length];
+  const id='m'+Date.now().toString(36);
+  S.modes.push({id, label:'New mode', color, desc:''});
+  save(); buildModes(); renderStatic();
+  const li=$('l-'+id); if(li){ li.focus(); li.select(); }
+  modeMsg(`Button added with key ${keyOf(id)||'(none)'}. Type a name for it.`);
+}
+function removeMode(id){
+  const vm=visibleModes();
+  if(vm.length<=1){ modeMsg('Keep at least one button.', true); return; }
+  if(curMode()===id){ modeMsg('This button is recording right now. Switch to another button or pause first.', true); buildModes(); return; }
+  const name=labelOf(id), used=S.segs.some(g=>g.m===id);
+  if(used) modeById(id).hidden=true; else S.modes=S.modes.filter(m=>m.id!==id);
+  save(); buildModes(); renderStatic();
+  modeMsg(used ? `"${name}" removed from the buttons. Its time stays in the log and totals.` : `"${name}" removed. Keys renumbered.`);
+}
+function autosize(ta){ ta.style.height='auto'; ta.style.height=ta.scrollHeight+'px'; }
+function renderLegend(){
+  const box=$('legend'); if(!box) return;
+  if(box.contains(document.activeElement) && document.activeElement.tagName==='TEXTAREA') return;   // don't interrupt typing
+  box.innerHTML = visibleModes().map(m=>{
+    const k=keyOf(m.id);
+    return `<div class="lrow" style="--mc:${m.color}">
+      <div class="lname"><i></i><b>${esc(labelOf(m.id))}</b>${k?`<span class="key">${k}</span>`:''}</div>
+      <textarea class="ldesc" id="d-${m.id}" data-id="${m.id}" rows="1" placeholder="${esc(DESC_PH)}" aria-label="Description for ${esc(labelOf(m.id))}">${esc(m.desc||'')}</textarea>
+    </div>`; }).join('');
+  box.querySelectorAll('textarea').forEach(autosize);
 }
 
 function syncFields(){
   $('f-date').value=S.date; $('f-tracker').value=S.tracker; $('f-task').value=S.task; $('f-scale').value=String(S.scaleMin);
   $('f-parking').value=S.parking;
-  for(const m of MODES) $('c-'+m.id).value=S.colors[m.id];
 }
 for(const [id,key] of [['f-date','date'],['f-tracker','tracker'],['f-task','task'],['f-parking','parking']])
   $(id).addEventListener('input',e=>{ S[key]=e.target.value; save(); });
@@ -349,11 +464,14 @@ $('f-scale').addEventListener('change',e=>{ S.scaleMin=+e.target.value; save(); 
 
 /* ---------- render (static parts) ---------- */
 function renderStatic(scrollToEnd){
+  purgeModes();
   const cur=curMode();
-  for(const m of MODES){
-    const row=$('mode-'+m.id); row.style.setProperty('--mc',S.colors[m.id]);
-    row.classList.toggle('active',cur===m.id);
-    row.classList.toggle('disabled',S.finished);
+  for(const m of visibleModes()){
+    const row=$('mode-'+m.id); if(!row) continue;
+    row.style.setProperty('--mc',m.color);
+    const lt=row.querySelector('.lbltxt'); if(lt) lt.textContent=labelOf(m.id);
+    row.classList.toggle('active',!editing && cur===m.id);
+    row.classList.toggle('disabled',S.finished && !editing);
   }
   $('b-pause').disabled = !cur;
   $('b-finish').disabled = S.finished || !S.segs.length;
@@ -366,7 +484,8 @@ function renderStatic(scrollToEnd){
     const lastLive = !S.finished;
     tb.innerHTML = S.segs.map((g,i)=>{
       const live = lastLive && i===S.segs.length-1;
-      const opts = ALL_MODES.map(id=>`<option value="${id}"${id===g.m?' selected':''}>${LABEL[id]}</option>`).join('');
+      const ids = visibleModes().map(m=>m.id); if(g.m!==PZ && !ids.includes(g.m)) ids.push(g.m); ids.push(PZ);
+      const opts = ids.map(id=>`<option value="${id}"${id===g.m?' selected':''}>${esc(labelOf(id))}</option>`).join('');
       return `<tr data-i="${i}" class="${live?'live':''}${g.m===PZ?' paused':''}" style="--mc:${colorOf(g.m)}">
         <td class="num">${i+1}</td>
         <td><input class="tin" id="t-${i}" data-i="${i}" type="time" step="1" value="${timeVal(g.s)}" aria-label="Start time for row ${i+1}"></td>
@@ -405,7 +524,7 @@ function drawWheel(ctx, size, pal, now){
     const d=segDur(i,now); let a=cum, b=cum+d; cum=b;
     while(a<b){
       const k=Math.floor(a/L), lapEnd=(k+1)*L, pieceEnd=Math.min(b,lapEnd);
-      ctx.beginPath(); ctx.strokeStyle=S.colors[g.m]; ctx.lineWidth=w;
+      ctx.beginPath(); ctx.strokeStyle=colorOf(g.m); ctx.lineWidth=w;
       const a0=ang(a), a1 = pieceEnd===lapEnd ? -Math.PI/2+2*Math.PI : ang(pieceEnd);
       ctx.arc(c,c,ringR(k),a0,a1+0.002); ctx.stroke();
       a=pieceEnd;
@@ -436,8 +555,8 @@ function drawWheel(ctx, size, pal, now){
   const inner = ringR(laps-1) - w/2;
   ctx.textAlign='center'; ctx.textBaseline='middle';
   const cm=curMode();
-  const cur = cm ? LABEL[cm] : (S.finished ? 'Complete' : (S.segs.length ? 'Paused' : 'Ready'));
-  ctx.fillStyle = cm ? S.colors[cm] : pal.muted;
+  const cur = cm ? labelOf(cm) : (S.finished ? 'Complete' : (S.segs.length ? 'Paused' : 'Ready'));
+  ctx.fillStyle = cm ? colorOf(cm) : pal.muted;
   ctx.font=`700 ${Math.round(Math.min(size*0.05, inner*0.24))}px ${pal.sans}`;
   ctx.fillText(cur, c, c-inner*0.32);
   ctx.fillStyle=pal.ink;
@@ -461,14 +580,13 @@ function sizeCanvas(){ const r=cv.getBoundingClientRect(), dpr=window.devicePixe
 function tick(){
   const now=Date.now(), t=totals(now);
   drawWheel(cx, cv.width, screenPalette(), now);
-  const rows=[['on','On task'],['off','Off task'],['brk','Break']];
   $('totals').innerHTML =
     `<div class="trow total"><span class="sw"></span><span class="nm">Total time</span><span class="tm">${fmt(t.total)}</span><span class="pc">100%</span></div>` +
-    rows.map(([k,l])=>`<div class="trow" style="--mc:${S.colors[k]}"><span class="sw"></span><span class="nm">${l}</span><span class="tm">${fmt(t[k])}</span><span class="pc">${t.total?pct(t[k],t.total):'—'}</span></div>`).join('');
+    shownModes(t).map(m=>`<div class="trow" style="--mc:${m.color}"><span class="sw"></span><span class="nm">${esc(labelOf(m.id))}${m.hidden?' <small>(removed)</small>':''}</span><span class="tm">${fmt(t[m.id])}</span><span class="pc">${t.total?pct(t[m.id],t.total):'—'}</span></div>`).join('');
   document.querySelectorAll('#logbody tr[data-i]').forEach(tr=>{ const i=+tr.dataset.i; if(S.segs[i]) tr.querySelector('.dur').textContent=fmt(segDur(i,now)); });
   const st=$('status'), cm=curMode();
   if(S.finished && S.segs.length) st.innerHTML=`<b>Session complete</b> · ${clock(S.segs[0].s)} – ${clock(S.end)}`;
-  else if(cm) st.innerHTML=`Recording <b>${LABEL[cm]}</b> · started ${clock(S.segs[0].s)}`;
+  else if(cm) st.innerHTML=`Recording <b>${esc(labelOf(cm))}</b> · started ${clock(S.segs[0].s)}`;
   else if(S.segs.length) st.innerHTML='<b>Paused</b> · press a mode to continue';
   else st.textContent='Ready. Press a mode to start.';
 }
@@ -509,18 +627,19 @@ function exportPDF(){
   const wSize=280;
   doc.addImage(off.toDataURL('image/png'), 'PNG', M-6, y, wSize, wSize);
 
-  let tx=M+wSize+18, ty=y+40;
-  const rowsT=[['Total time','#1d2330',t.total,'100%'],['On task',S.colors.on,t.on,pct(t.on,t.total)],
-               ['Off task',S.colors.off,t.off,pct(t.off,t.total)],['Break',S.colors.brk,t.brk,pct(t.brk,t.total)]];
+  const fit=(txt,w)=>{ txt=String(txt); if(doc.getTextWidth(txt)<=w) return txt; while(txt.length>1 && doc.getTextWidth(txt+'…')>w) txt=txt.slice(0,-1); return txt+'…'; };
+  const rowsT=[['Total time','#1d2330',t.total,'100%'], ...shownModes(t).map(m=>[labelOf(m.id), m.color, t[m.id], pct(t[m.id],t.total)])];
+  const step=Math.min(30, 240/rowsT.length);
+  let tx=M+wSize+18, ty=y+Math.max(24, (wSize-step*rowsT.length)/2+10);
   doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor('#636b7a'); doc.text('TOTALS', tx, ty-14);
   rowsT.forEach(([l,col,ms,p],i)=>{
     doc.setFillColor(col); doc.roundedRect(tx, ty-8, 10, 10, 2, 2, 'F');
     doc.setFont('helvetica', i===0?'bold':'normal'); doc.setFontSize(i===0?13:12); doc.setTextColor('#1d2330');
-    doc.text(l, tx+16, ty+1);
-    doc.setFont('courier','bold'); doc.text(fmt(ms), tx+150, ty+1, {align:'right'});
+    doc.text(fit(l, W-M-46-60-(tx+16)), tx+16, ty+1);
+    doc.setFont('courier','bold'); doc.text(fmt(ms), W-M-46, ty+1, {align:'right'});
     doc.setFont('courier','normal'); doc.setTextColor('#636b7a'); doc.text(p, W-M, ty+1, {align:'right'});
-    doc.setDrawColor('#dde1e8'); doc.line(tx, ty+9, W-M, ty+9);
-    ty+=30;
+    doc.setDrawColor('#dde1e8'); doc.line(tx, ty+step*0.3, W-M, ty+step*0.3);
+    ty+=step;
   });
   const counted=S.segs.filter(g=>g.m!==PZ).length, paused=S.segs.length-counted;
   doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor('#636b7a');
@@ -528,9 +647,18 @@ function exportPDF(){
 
   y+=wSize+18;
   doc.setFontSize(9); doc.setTextColor('#636b7a');
-  const defs=['On-task: includes everything that contributes to completing the task.',
-    'Off-task: includes everything that causes a delay in completing the task, including unnecessary comments, questions, actions, and spontaneous breaks.'];
-  defs.forEach(d=>{ const lines=doc.splitTextToSize(d, W-2*M); doc.text(lines, M, y); y+=lines.length*11+3; });
+  shownModes(t).filter(m=>(m.desc||'').trim()).forEach(m=>{
+    const head=labelOf(m.id)+': ';
+    doc.setFillColor(m.color); doc.circle(M+3, y-3, 3, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor('#1d2330'); doc.text(head, M+10, y);
+    const hw=doc.getTextWidth(head);
+    doc.setFont('helvetica','normal'); doc.setTextColor('#636b7a');
+    const first=doc.splitTextToSize(m.desc.trim(), W-2*M-10-hw);
+    doc.text(first[0], M+10+hw, y);
+    const rest=first.length>1 ? doc.splitTextToSize(first.slice(1).join(' '), W-2*M-10) : [];
+    if(rest.length) doc.text(rest, M+10, y+11);
+    y+=(1+rest.length)*11+3;
+  });
   y+=10;
 
   doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor('#1d2330'); doc.text('Parking lot', M, y); y+=8;
@@ -562,7 +690,7 @@ function exportPDF(){
     const ink = g.m===PZ ? '#8a92a0' : '#1d2330';
     doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(ink);
     doc.text(String(i+1), M, y); doc.text(clock(g.s), M+24, y);
-    doc.setFillColor(colorOf(g.m,true)); doc.circle(M+111, y-3.5, 3.5, 'F'); doc.text(LABEL[g.m], M+119, y);
+    doc.setFillColor(colorOf(g.m,true)); doc.circle(M+111, y-3.5, 3.5, 'F'); doc.text(fit(labelOf(g.m), 64), M+119, y);
     doc.setFont('courier','normal'); doc.text(fmt(segDur(i,now)), M+188, y);
     if(nLines.length){ doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor('#3a4150'); doc.text(nLines, M+262, y); }
     y+=rowH;
@@ -580,6 +708,13 @@ $('b-finish').addEventListener('click',finish);
 $('b-reset').addEventListener('click',reset);
 $('b-pdf').addEventListener('click',exportPDF);
 
+$('legend').addEventListener('input',e=>{
+  const ta=e.target; if(!ta.classList.contains('ldesc')) return;
+  const m=modeById(ta.dataset.id); if(!m) return;
+  m.desc=ta.value; save(); autosize(ta);
+});
+$('legend').addEventListener('keydown',e=>{ if(e.key==='Enter' && !e.shiftKey && e.target.classList.contains('ldesc')){ e.preventDefault(); e.target.blur(); } });
+window.addEventListener('resize',()=>document.querySelectorAll('.ldesc').forEach(autosize));
 const LB=$('logbody');
 LB.addEventListener('input',e=>{
   const el=e.target, i=+el.dataset.i; if(Number.isNaN(i) || !S.segs[i]) return;
@@ -630,7 +765,8 @@ $('b-stamp').addEventListener('click',()=>{
 });
 document.addEventListener('keydown',e=>{
   if(e.target.closest('input,select,textarea')) return;
-  const m=MODES.find(x=>x.key===e.key); if(m){ setMode(m.id); e.preventDefault(); }
+  const n=/^[1-9]$/.test(e.key) ? +e.key : 0, vm=visibleModes();
+  if(n && n<=vm.length && !editing){ setMode(vm[n-1].id); e.preventDefault(); }
   if(e.code==='Space'){ pause(); e.preventDefault(); }
 });
 window.addEventListener('resize',()=>{ sizeCanvas(); tick(); });
