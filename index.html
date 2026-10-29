@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TallyTime</title>
+<title>Guide My Plan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500;700&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -23,12 +23,34 @@
 html,body{margin:0}
 body{background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:16px; line-height:1.4}
 .wrap{max-width:1360px; margin:0 auto; padding-block:20px 40px; padding-inline:16px; display:grid; gap:18px}
-header.top{display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:8px}
+header.top{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px}
+.topright{display:flex; flex-wrap:wrap; align-items:center; gap:8px 14px}
+dialog#setups{width:min(600px, calc(100% - 32px)); max-height:calc(100% - 48px); overflow:auto; border:1px solid var(--line); border-radius:14px; padding:18px 20px; background:var(--surface); color:var(--ink); box-shadow:0 20px 60px rgba(0,0,0,.25)}
+dialog#setups::backdrop{background:rgba(15,20,30,.45)}
+.dhead{display:flex; align-items:center; justify-content:space-between; gap:10px}
+.dhead h2{margin:0; font-size:1.2rem}
+#setups h3{font-size:.78rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:18px 0 8px}
+.dnote{font-size:.88rem; color:var(--muted); margin:6px 0 0}
+.presetlist{display:grid; border:1px solid var(--line); border-radius:10px; overflow:hidden}
+.prow2{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:4px 10px; align-items:center; padding:9px 12px; border-bottom:1px solid var(--line)}
+.prow2:last-child{border-bottom:0}
+.prow2 .pn{font-weight:700; min-width:0; overflow-wrap:anywhere}
+.prow2 .ps{grid-column:1; font-size:.82rem; color:var(--muted)}
+.prow2 .pa{grid-column:2; grid-row:1 / span 2; display:flex; gap:6px}
+.presetlist .empty{padding:12px; color:var(--muted); font-size:.9rem}
+.saverow{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px}
+.saverow input{flex:1; min-width:200px; font:inherit; color:var(--ink); background:var(--bg); border:1.5px solid var(--line); border-radius:8px; padding:7px 10px}
+.saverow input:focus{outline:none; border-color:var(--focus)}
+.filerow{display:flex; flex-wrap:wrap; gap:8px}
+label.btn{display:inline-flex; align-items:center}
+#setupmsg{margin-top:14px; font-size:.9rem; color:var(--muted); min-height:1.3em}
+#setupmsg.bad{color:var(--bad); font-weight:700}
+#setupmsg.good{color:var(--ink); font-weight:700}
 h1{font-size:1.45rem; margin:0; letter-spacing:.01em}
 .status{font-size:.9rem; color:var(--muted)}
 .status b{color:var(--ink)}
 
-.fields{display:grid; grid-template-columns:minmax(140px,1fr) minmax(160px,1.4fr) minmax(200px,2.2fr) auto; gap:12px;
+.fields{display:grid; grid-template-columns:minmax(130px,1fr) minmax(150px,1.3fr) minmax(180px,2fr) auto auto; gap:12px;
   background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px}
 .field{display:grid; gap:4px; min-width:0}
 .field label{font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:700}
@@ -74,6 +96,58 @@ h1{font-size:1.45rem; margin:0; letter-spacing:.01em}
 #modemsg:empty{display:none}
 #modemsg.bad{color:var(--bad); font-weight:700}
 .trow .nm small{color:var(--muted); font-weight:400}
+.trow.play .nm{font-weight:700}
+.trow.play .tm{font-size:1.5rem; font-weight:700; color:var(--mc)}
+.trow.play.out .tm{color:var(--bad)}
+.playbox{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:10px 14px; display:grid; gap:10px}
+.switch{position:relative; display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700; width:max-content; max-width:100%}
+.switch input{position:absolute; opacity:0; width:1px; height:1px}
+.switch .trk{width:44px; height:26px; border-radius:13px; background:var(--track); border:1px solid var(--line); position:relative; flex:none; transition:background .15s}
+.switch .knob{position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%; background:var(--surface); box-shadow:0 1px 3px rgba(0,0,0,.3); transition:left .15s}
+.switch input:checked + .trk{background:var(--focus); border-color:var(--focus)}
+.switch input:checked + .trk .knob{left:20px}
+.switch input:focus-visible + .trk{outline:3px solid var(--focus); outline-offset:2px}
+@media (prefers-reduced-motion:reduce){ .switch .trk,.switch .knob{transition:none} }
+.playset{display:grid; gap:8px; font-size:.92rem}
+.prow{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+.prow.pstack{display:grid; justify-items:start; gap:6px}
+.prow label[for]{color:var(--muted); font-weight:700; font-size:.78rem; text-transform:uppercase; letter-spacing:.08em}
+.pnum{display:inline-flex; align-items:center; gap:6px}
+.pnum input{font:inherit; font-family:var(--mono); width:5em; color:var(--ink); background:var(--bg); border:1.5px solid var(--line); border-radius:8px; padding:5px 8px}
+.pnum input:focus{outline:none; border-color:var(--focus)}
+.cpick.sm{width:30px; height:30px; margin-left:auto}
+.plbl{color:var(--muted); font-size:.85rem}
+.pchips{display:flex; flex-wrap:wrap; gap:6px}
+.pchip{display:inline-flex; align-items:center; gap:6px; border:1.5px solid var(--line); border-radius:999px; padding:4px 10px 4px 6px; cursor:pointer; font-weight:700; font-size:.88rem}
+.pchip input{margin:0; accent-color:var(--mc)}
+.pchip i{width:9px; height:9px; border-radius:50%; background:var(--mc)}
+.pchip:has(input:checked){border-color:var(--mc); background:color-mix(in srgb, var(--mc) 10%, transparent)}
+.phint{font-size:.82rem; color:var(--muted)}
+.swrow{display:flex; align-items:center; gap:10px; min-width:0}
+.swlabel{font:inherit; font-weight:700; font-size:1rem; color:var(--ink); background:transparent; border:1px solid transparent; border-bottom:1.5px dashed var(--line); border-radius:6px 6px 0 0; padding:3px 6px; min-width:0; flex:1}
+.swlabel:hover{border-bottom-color:var(--muted)}
+.swlabel:focus{outline:none; border-color:var(--focus); border-radius:6px; background:var(--bg)}
+.swname{font-weight:700}
+.planner{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px; min-width:0}
+.planner h2{font-size:1rem; margin:0}
+.ptable{min-width:560px}
+.ptable td.ptask{width:60%}
+.ptable td.ptask input{font:inherit; font-size:.92rem; color:var(--ink); background:transparent; width:100%; min-width:0; border:1px solid var(--line); border-radius:6px; padding:5px 8px}
+.ptable td.ptask input:focus{outline:none; border-color:var(--focus); background:var(--bg)}
+.ptable td.num{border-left:4px solid var(--mc)}
+.ptable .cpick.sm{margin-left:0}
+.ptable .ib:disabled{opacity:.35; cursor:default}
+.pfoot{display:flex; flex-wrap:wrap; align-items:center; gap:8px 14px; margin-top:10px; font-size:.9rem; color:var(--muted)}
+.pfoot b{color:var(--ink); font-family:var(--mono)}
+.trow.plan .sw{background:repeating-linear-gradient(45deg, var(--muted) 0 2px, transparent 2px 4px); border:1px solid var(--muted)}
+.field select:disabled,.field input:disabled{opacity:.5}
+.flabel{font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:700}
+.lapgrp{display:flex; align-items:flex-end; gap:6px}
+.lapgrp input{width:4.6em; font-family:var(--mono)}
+.lapgrp select{width:auto}
+.clockgrp{display:flex; align-items:center; gap:10px; min-height:38px}
+.clockgrp input[type=time]{font-family:var(--mono); width:auto}
+.fnote{font-size:.78rem; color:var(--muted); min-height:1em}
 
 .totals{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:6px 14px}
 .trow{display:grid; grid-template-columns:auto 1fr auto auto; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--line)}
@@ -173,19 +247,51 @@ td.rowact{white-space:nowrap; text-align:right; width:1%}
 <body>
 <div class="wrap">
   <header class="top">
-    <h1>TallyTime</h1>
-    <div class="status" id="status">Ready. Press a mode to start.</div>
+    <h1>Guide My Plan</h1>
+    <div class="topright"><div class="status" id="status">Ready. Press a mode to start.</div><button type="button" class="btn small" id="b-setups">Setups</button></div>
   </header>
+
+  <dialog id="setups" aria-labelledby="setups-h">
+    <div class="dhead"><h2 id="setups-h">Setups</h2><button type="button" class="ib" id="b-closesetups" aria-label="Close">×</button></div>
+    <p class="dnote">A setup saves your buttons (names, colors, descriptions), the wheel lap, clock display, Free Time settings and planned tasks. Loading one doesn't change the current session's times, log or notes.</p>
+
+    <h3>Saved in this browser</h3>
+    <div id="presetlist" class="presetlist"></div>
+    <form id="saveform" class="saverow">
+      <label for="preset-name" class="sr">Setup name</label>
+      <input id="preset-name" type="text" maxlength="40" placeholder="Name this setup, e.g. Math homework" autocomplete="off">
+      <button type="submit" class="btn small primary" id="b-savepreset">Save current setup</button>
+    </form>
+
+    <h3>Settings file</h3>
+    <p class="dnote">Use a file to move a setup to another computer or browser, or to keep a backup.</p>
+    <div class="filerow">
+      <button type="button" class="btn small" id="b-download">Download settings file</button>
+      <label class="btn small" for="f-loadfile">Load settings file</label>
+      <input type="file" id="f-loadfile" accept=".json,application/json" class="sr">
+    </div>
+
+    <h3>Start over</h3>
+    <div class="filerow"><button type="button" class="btn small warn" id="b-defaults">Restore default settings</button></div>
+
+    <div id="setupmsg" role="status" aria-live="polite"></div>
+  </dialog>
 
   <section class="fields" aria-label="Session details">
     <div class="field"><label for="f-date">Date</label><input id="f-date" type="text" autocomplete="off"></div>
     <div class="field"><label for="f-tracker">Tracker (Name)</label><input id="f-tracker" type="text" placeholder="Who is recording" autocomplete="off"></div>
     <div class="field"><label for="f-task">Task</label><input id="f-task" type="text" placeholder="e.g. Math worksheet, p. 14" autocomplete="off"></div>
     <div class="field"><label for="f-scale">Wheel = 1 lap</label>
-      <select id="f-scale">
-        <option value="10">10 min</option><option value="15">15 min</option><option value="20">20 min</option>
-        <option value="30">30 min</option><option value="45">45 min</option><option value="60">60 min</option>
-      </select>
+      <div class="lapgrp"><input id="f-scale" type="number" min="0.1" max="720" step="any" inputmode="decimal" aria-describedby="lapnote"><select id="f-unit" aria-label="Wheel lap unit"><option value="min">min</option><option value="hr">hr</option></select></div>
+      <span class="fnote" id="lapnote"></span>
+    </div>
+    <div class="field clockfield">
+      <span class="flabel">Clock display</span>
+      <div class="clockgrp">
+        <label class="switch"><input type="checkbox" id="c-on" role="switch" aria-label="Clock display"><span class="trk"><span class="knob"></span></span></label>
+        <span id="clockset" hidden><label for="c-start" class="sr">Clock start time</label><input id="c-start" type="time" step="60"></span>
+      </div>
+      <span class="fnote" id="clocknote"></span>
     </div>
   </section>
 
@@ -195,6 +301,24 @@ td.rowact{white-space:nowrap; text-align:right; width:1%}
     <div class="side">
       <div class="modes" id="modes"></div>
       <div id="modemsg" role="status" aria-live="polite"></div>
+
+      <div class="playbox">
+        <div class="swrow"><label class="switch"><input type="checkbox" id="p-on" role="switch" aria-label="Free Time Remaining mode"><span class="trk"><span class="knob"></span></span></label><input id="p-label" class="swlabel" type="text" maxlength="32" title="Click to rename" aria-label="Name for this timer" autocomplete="off"></div>
+        <div class="playset" id="playset" hidden>
+          <div class="prow">
+            <label for="p-block">Time block</label>
+            <span class="pnum"><input id="p-block" type="number" min="1" max="720" step="any" inputmode="decimal"> min</span>
+            <label class="cpick sm" title="Color"><input type="color" id="p-color" aria-label="Color for this timer"></label>
+          </div>
+          <div class="prow pstack"><span class="plbl">Counts against it:</span><span id="p-counts" class="pchips"></span></div>
+          <div class="phint">Time remaining = time block minus the time on the checked buttons. The time block is the same as the wheel lap. Click the name to rename it.</div>
+        </div>
+      </div>
+
+      <div class="playbox">
+        <div class="swrow"><label class="switch"><input type="checkbox" id="pl-on" role="switch" aria-label="Planner mode"><span class="trk"><span class="knob"></span></span></label><span class="swname">Planner mode</span></div>
+        <div class="phint" id="plhint" hidden>Planned tasks show as an inner ring on the wheel. Edit them in the Planned time table below.</div>
+      </div>
 
       <div class="totals" id="totals"></div>
 
@@ -217,6 +341,12 @@ td.rowact{white-space:nowrap; text-align:right; width:1%}
   </section>
 
 
+  <section class="planner" id="planner" hidden>
+    <div class="loghead"><h2>Planned time</h2><span class="loghint">List tasks in order with an estimate. They fill the inner ring of the wheel on the same time scale.</span></div>
+    <div class="logscroll"><table class="ptable"><thead><tr><th>#</th><th>Task</th><th>Estimate</th><th>Color</th><th><span class="sr">Edit</span></th></tr></thead><tbody id="planbody"></tbody></table></div>
+    <div class="pfoot"><button type="button" class="btn small" id="b-addtask">+ Add task</button><span id="plansum"></span></div>
+  </section>
+
   <section class="log">
     <div class="loghead"><h2>Segment log</h2><span class="loghint">Fix mistakes here: change a start time or mode, add a row with +, or delete with ×. Each row runs until the next row starts.</span></div>
     <div class="logscroll"><table><thead><tr><th>#</th><th>Start</th><th>Mode</th><th>Duration</th><th>Note (optional)</th><th><span class="sr">Edit</span></th></tr></thead><tbody id="logbody"></tbody></table></div>
@@ -233,8 +363,8 @@ td.rowact{white-space:nowrap; text-align:right; width:1%}
 <script>
 const PZ = 'pz';
 const DEFAULT_MODES = [
-  {id:'on',  label:'On task',  color:'#2e9a68', desc:'Includes everything that contributes to completing the task.'},
-  {id:'off', label:'Off task', color:'#d2544a', desc:'Includes everything that causes a delay in completing the task, including unnecessary comments, questions, actions, and spontaneous breaks.'},
+  {id:'on',  label:'Planned',  color:'#2e9a68', desc:'Includes everything that contributes to completing the task.'},
+  {id:'off', label:'Unplanned', color:'#d2544a', desc:'Includes everything that causes a delay in completing the task, including unnecessary comments, questions, actions, and spontaneous breaks.'},
   {id:'brk', label:'Break',    color:'#e3a23a', desc:'A planned break.'}
 ];
 const DESC_PH = '<Enter description>';
@@ -271,8 +401,18 @@ if(!Array.isArray(S.modes)){
   S.modes = DEFAULT_MODES.map(m=>({...m, color:(S.colors && S.colors[m.id]) || m.color}));
   delete S.colors;
 }
+// rename the old default button names (only if never customised)
+S.modes.forEach(m=>{ if(m.id==='on' && m.label==='On task') m.label='Planned'; if(m.id==='off' && m.label==='Off task') m.label='Unplanned'; });
 S.modes.forEach(m=>{ if(typeof m.desc!=='string'){ const d=DEFAULT_MODES.find(x=>x.id===m.id && x.label===m.label); m.desc = d ? d.desc : ''; } });
 if(!S.segs.length) S.date = todayStr();     // a new (unstarted) session always opens on today's date
+if(!S.play || typeof S.play!=='object') S.play={on:false, block:60, color:'#57a6e8', counts:{}};
+const FREE_DEFAULT='Time Remaining';
+if(S.scaleUnit!=='hr' && S.scaleUnit!=='min') S.scaleUnit='min';
+if(!(S.scaleMin>0)) S.scaleMin=60;
+if(!S.clock || typeof S.clock!=='object') S.clock={on:false, start:'16:30'};
+if(typeof S.play.label!=='string' || S.play.label==='Free Time Remaining') S.play.label=FREE_DEFAULT;
+const PLAN_COLORS=['#7c9cbf','#b08fc7','#7fb59a','#d6a26b','#c98a8a','#8ab0b8','#a8a86a','#9a8fd1'];
+if(!S.plan || typeof S.plan!=='object') S.plan={on:false, items:[]};
 let editing = false;
 
 /* ---------- helpers ---------- */
@@ -291,6 +431,22 @@ function colorOf(id, pdf){ if(id===PZ) return pdf ? PZ_PDF : 'var(--pz)'; const 
 function keyOf(id){ const i=visibleModes().findIndex(m=>m.id===id); return i>=0 && i<9 ? String(i+1) : ''; }
 function shownModes(t){ return S.modes.filter(m=>!m.hidden || (t && t[m.id]>0)); }   // removed buttons still show if they have time
 function purgeModes(){ S.modes = S.modes.filter(m=>!m.hidden || S.segs.some(g=>g.m===m.id)); }
+function lapMin(){ return S.scaleMin; }      // one length for the dial, the clock window and the free-time block
+function lapText(m){ m=+m; if(m>=60 && m%60===0) return `${m/60} hr`; if(m>60) return `${Math.floor(m/60)} hr ${Math.round(m%60)} min`; return `${+m.toFixed(2)} min`; }
+function hm(min){ min=((Math.round(min)%1440)+1440)%1440; const h=Math.floor(min/60), mm=min%60; return {h, mm, h12:(h%12)||12, ap:h<12?'AM':'PM'}; }
+function clockShort(min){ const t=hm(min); return `${t.h12}:${String(t.mm).padStart(2,'0')}`; }
+function clockLong(min){ const t=hm(min); return `${t.h12}:${String(t.mm).padStart(2,'0')} ${t.ap}`; }
+function clockStartMin(){ const [h,m]=String(S.clock.start||'16:30').split(':').map(Number); return (h||0)*60+(m||0); }
+function clockStartTs(){ const base=S.segs.length ? new Date(S.segs[0].s) : new Date(); const sm=clockStartMin(); base.setHours(Math.floor(sm/60), sm%60, 0, 0); return base.getTime(); }
+function clockRange(){ const a=clockStartMin(); return `${clockLong(a)} – ${clockLong(a+lapMin())}`; }
+function freeLabel(){ return (S.play.label||'').trim() || FREE_DEFAULT; }
+function planTotalMs(){ return S.plan.items.reduce((a,it)=>a+Math.max(0,+it.min||0)*60000,0); }
+function countsPlay(id){ return S.play.counts[id] !== false; }
+function playInfo(t){
+  const blockMs=S.scaleMin*60000;
+  const used=S.modes.reduce((a,m)=>a+(countsPlay(m.id)?(t[m.id]||0):0),0);
+  return {blockMs, used, left:Math.max(0,blockMs-used), over:Math.max(0,used-blockMs)};
+}
 function totals(now){
   const t={total:0}; S.modes.forEach(m=>t[m.id]=0);
   S.segs.forEach((g,i)=>{ if(g.m===PZ) return; const d=segDur(i,now); t[g.m]=(t[g.m]||0)+d; t.total+=d; });
@@ -326,7 +482,7 @@ function reset(){
   const b=$('b-reset');
   if(!resetArmed){ b.textContent='Tap again to clear'; resetArmed=setTimeout(()=>{resetArmed=null; b.textContent='Reset';},3000); return; }
   clearTimeout(resetArmed); resetArmed=null; b.textContent='Reset';
-  const keep={modes:visibleModes(), scaleMin:S.scaleMin, tracker:S.tracker};
+  const keep={modes:visibleModes(), scaleMin:S.scaleMin, scaleUnit:S.scaleUnit, clock:S.clock, tracker:S.tracker, play:S.play, plan:S.plan};
   S=Object.assign(fresh(), keep); save(); syncFields(); renderStatic(); logMsg("");
 }
 
@@ -395,7 +551,7 @@ function buildModes(){
       row.querySelector('input[type=color]').addEventListener('input',e=>{ m.color=e.target.value; row.style.setProperty('--mc',m.color); save(); renderStatic(); });
       const li=row.querySelector('.lbl');
       li.addEventListener('focus',()=>{ li.dataset.orig=m.label; });
-      li.addEventListener('input',e=>{ m.label=e.target.value; save(); renderStatic(); renderLegend(); });
+      li.addEventListener('input',e=>{ m.label=e.target.value; save(); renderStatic(); renderLegend(); renderPlay(); });
       li.addEventListener('blur',e=>{
         if(!m.label.trim()){ m.label='Mode '+(vm.indexOf(m)+1); e.target.value=m.label; }
         if(li.dataset.orig!==undefined && m.label.trim()!==li.dataset.orig.trim() && m.desc){
@@ -420,7 +576,7 @@ function buildModes(){
   box.appendChild(tools);
   $('b-editmodes').addEventListener('click',()=>{ editing=!editing; buildModes(); renderStatic(); modeMsg(editing?'Rename, recolor, add or remove buttons. Keys renumber automatically.':''); });
   if(editing) $('b-addmode').addEventListener('click',addMode);
-  renderLegend();
+  renderLegend(); renderPlay();
 }
 function addMode(){
   const vm=visibleModes(); if(vm.length>=MAX_MODES){ modeMsg(`You can have up to ${MAX_MODES} buttons.`, true); return; }
@@ -442,6 +598,40 @@ function removeMode(id){
   modeMsg(used ? `"${name}" removed from the buttons. Its time stays in the log and totals.` : `"${name}" removed. Keys renumbered.`);
 }
 function autosize(ta){ ta.style.height='auto'; ta.style.height=ta.scrollHeight+'px'; }
+function renderPlan(){
+  $('pl-on').checked=S.plan.on; $('planner').hidden=!S.plan.on; $('plhint').hidden=!S.plan.on;
+  const pb=$('planbody');
+  if(!S.plan.items.length){ pb.innerHTML='<tr><td colspan="5" class="empty">No tasks yet. Add the tasks you expect to do and how long each should take.</td></tr>'; }
+  else pb.innerHTML=S.plan.items.map((it,i)=>`<tr data-i="${i}" style="--mc:${it.color}">
+      <td class="num">${i+1}</td>
+      <td class="ptask"><input id="pt-${i}" data-i="${i}" data-f="task" type="text" maxlength="60" placeholder="Task name" value="${esc(it.task)}" aria-label="Task ${i+1} name" autocomplete="off"></td>
+      <td><span class="pnum"><input id="pm-${i}" data-i="${i}" data-f="min" type="number" min="1" max="600" step="1" inputmode="numeric" value="${+it.min||''}" aria-label="Task ${i+1} estimate in minutes"> min</span></td>
+      <td><label class="cpick sm" style="--mc:${it.color}" title="Task color"><input type="color" data-i="${i}" data-f="color" value="${it.color}" aria-label="Task ${i+1} color"></label></td>
+      <td class="rowact"><button type="button" class="ib" data-act="up" data-i="${i}" title="Move up" aria-label="Move task ${i+1} up"${i===0?' disabled':''}>↑</button><button type="button" class="ib" data-act="down" data-i="${i}" title="Move down" aria-label="Move task ${i+1} down"${i===S.plan.items.length-1?' disabled':''}>↓</button><button type="button" class="ib del" data-act="del" data-i="${i}" title="Delete task" aria-label="Delete task ${i+1}">×</button></td>
+    </tr>`).join('');
+  planSum();
+}
+function planSum(){
+  const tot=planTotalMs(), lm=lapMin();
+  let txt=`Total planned: <b>${fmt(tot)}</b>`;
+  if(tot > lm*60000) txt += ` · longer than one ${lapText(lm)} lap, so it continues on another inner ring`;
+  $('plansum').innerHTML=txt;
+}
+function addTask(){
+  const used=new Set(S.plan.items.map(i=>i.color));
+  const color=PLAN_COLORS.find(c=>!used.has(c)) || PLAN_COLORS[S.plan.items.length%PLAN_COLORS.length];
+  S.plan.items.push({task:'', min:10, color}); save(); renderPlan(); tick();
+  const el=$('pt-'+(S.plan.items.length-1)); if(el) el.focus();
+}
+function renderPlay(){
+  $('p-on').checked=S.play.on; $('playset').hidden=!S.play.on;
+  if(document.activeElement!==$('p-label')) $('p-label').value=S.play.label;
+  $('p-on').setAttribute('aria-label', freeLabel()+' mode');
+  if(document.activeElement!==$('p-block')) $('p-block').value=+S.scaleMin.toFixed(1); $('p-color').value=S.play.color;
+  $('p-color').parentElement.style.setProperty('--mc', S.play.color);
+  renderLap(); renderClock();
+  $('p-counts').innerHTML = visibleModes().map(m=>`<label class="pchip" style="--mc:${m.color}"><input type="checkbox" data-id="${m.id}"${countsPlay(m.id)?' checked':''}><i></i>${esc(labelOf(m.id))}</label>`).join('');
+}
 function renderLegend(){
   const box=$('legend'); if(!box) return;
   if(box.contains(document.activeElement) && document.activeElement.tagName==='TEXTAREA') return;   // don't interrupt typing
@@ -455,12 +645,37 @@ function renderLegend(){
 }
 
 function syncFields(){
-  $('f-date').value=S.date; $('f-tracker').value=S.tracker; $('f-task').value=S.task; $('f-scale').value=String(S.scaleMin);
+  $('f-date').value=S.date; $('f-tracker').value=S.tracker; $('f-task').value=S.task; renderLap(); renderClock();
   $('f-parking').value=S.parking;
 }
 for(const [id,key] of [['f-date','date'],['f-tracker','tracker'],['f-task','task'],['f-parking','parking']])
   $(id).addEventListener('input',e=>{ S[key]=e.target.value; save(); });
-$('f-scale').addEventListener('change',e=>{ S.scaleMin=+e.target.value; save(); });
+function renderLap(){
+  const f=$('f-scale'), u=$('f-unit');
+  u.value=S.scaleUnit;
+  if(document.activeElement!==f) f.value = S.scaleUnit==='hr' ? +(S.scaleMin/60).toFixed(2) : +S.scaleMin.toFixed(1);
+  f.disabled=u.disabled=false;
+  $('lapnote').textContent = S.play.on ? `Also the ${freeLabel()} time block` : '';
+  const pb=$('p-block'); if(pb && document.activeElement!==pb) pb.value=+S.scaleMin.toFixed(1);
+}
+function renderClock(){
+  $('c-on').checked=S.clock.on; $('clockset').hidden=!S.clock.on;
+  if(document.activeElement!==$('c-start')) $('c-start').value=S.clock.start;
+  $('clocknote').textContent = S.clock.on ? `Ends ${clockLong(clockStartMin()+lapMin())}` : '';
+}
+function lapChanged(){ save(); renderClock(); if(document.activeElement!==$('p-block')) $('p-block').value=+S.scaleMin.toFixed(1); if($('plansum')) planSum(); tick(); }
+$('f-scale').addEventListener('input',e=>{
+  const v=parseFloat(e.target.value); if(!(v>0)) return;
+  const m = S.scaleUnit==='hr' ? v*60 : v;
+  if(m<1 || m>720) return;
+  S.scaleMin=Math.round(m*10)/10; lapChanged();
+});
+$('f-scale').addEventListener('blur',renderLap);
+$('f-scale').addEventListener('keydown',e=>{ if(e.key==='Enter') e.target.blur(); });
+$('f-unit').addEventListener('change',e=>{ S.scaleUnit=e.target.value; save(); renderLap(); });
+$('c-on').addEventListener('change',e=>{ S.clock.on=e.target.checked; save(); renderClock(); tick(); });
+$('c-start').addEventListener('input',e=>{ if(/^\d{2}:\d{2}/.test(e.target.value)){ S.clock.start=e.target.value.slice(0,5); save(); renderClock(); tick(); } });
+$('c-start').addEventListener('blur',renderClock);
 
 /* ---------- render (static parts) ---------- */
 function renderStatic(scrollToEnd){
@@ -477,7 +692,7 @@ function renderStatic(scrollToEnd){
   $('b-finish').disabled = S.finished || !S.segs.length;
 
   const tb=$('logbody');
-  if(!S.segs.length){ tb.innerHTML='<tr><td colspan="6" class="empty">No segments yet. Press On task, Off task or Break to begin.</td></tr>'; }
+  if(!S.segs.length){ tb.innerHTML='<tr><td colspan="6" class="empty">No segments yet. Press a button to begin.</td></tr>'; }
   else{
     const ae=document.activeElement, fid=ae && ae.id && tb.contains(ae) ? ae.id : null;
     const caret = fid && fid.startsWith('n-') ? ae.selectionStart : null;
@@ -502,15 +717,30 @@ function renderStatic(scrollToEnd){
 
 /* ---------- wheel drawing (shared by screen + PDF) ---------- */
 function drawWheel(ctx, size, pal, now){
-  const c=size/2, L=S.scaleMin*60000;
-  const tot=totals(now).total;
-  const laps=Math.max(1, Math.ceil(tot/L) || 1);
-  const R = size/2 - size*0.075;
+  const P=S.play.on, T=totals(now), pi=playInfo(T), CK=S.clock.on;
+  const Lmin = lapMin(), L=Lmin*60000, c=size/2;
+  const t0 = CK ? clockStartTs() : 0;
+
+  // positions on the dial: elapsed mode stacks recorded time from 0; clock mode places it at real clock time
+  const pieces=[]; let cum=0;
+  S.segs.forEach((g,i)=>{
+    if(g.m===PZ) return;
+    if(CK){ let a=g.s-t0, b=segEnd(i,now)-t0; if(b<=0) return; a=Math.max(0,a); if(b>a) pieces.push([a,b,g.m]); }
+    else { const d=segDur(i,now); pieces.push([cum,cum+d,g.m]); cum+=d; }
+  });
+  const nowPos = CK ? (S.segs.length ? (S.finished ? S.end : now)-t0 : -1) : T.total;
+  const reach = Math.max(nowPos, ...pieces.map(x=>x[1]), 0);
+  const laps=Math.min(4, Math.max(1, Math.ceil(reach/L) || 1));
+  const longLbl = CK || Lmin>60;
+  const R = size/2 - size*(longLbl ? 0.115 : 0.075);
   const usable = R*0.58;
   const w = Math.min(size*0.085, usable/laps*0.82);
   const gap = Math.min(size*0.012, usable/laps*0.18);
-  const ringR = k => R - w/2 - k*(w+gap);
+  const ow = size*0.032, og = size*0.014;               // Time Remaining outer ring
+  const off0 = P ? ow+og : 0;
+  const ringR = k => R - off0 - w/2 - k*(w+gap);
   const ang = t => -Math.PI/2 + 2*Math.PI*((t%L)/L);
+  const tot = nowPos;
 
   ctx.clearRect(0,0,size,size);
   if(pal.bg){ ctx.fillStyle=pal.bg; ctx.fillRect(0,0,size,size); }
@@ -518,33 +748,64 @@ function drawWheel(ctx, size, pal, now){
   ctx.lineCap='butt';
   for(let k=0;k<laps;k++){ ctx.beginPath(); ctx.strokeStyle=pal.track; ctx.lineWidth=w; ctx.arc(c,c,ringR(k),0,Math.PI*2); ctx.stroke(); }
 
-  let cum=0;
-  S.segs.forEach((g,i)=>{
-    if(g.m===PZ) return;
-    const d=segDur(i,now); let a=cum, b=cum+d; cum=b;
-    while(a<b){
+  // Time Remaining: a thin outer ring. Full ring = the time block; the colored part is what's left.
+  // Elapsed mode: it runs from the time used to the end. Clock mode: it is the last part of the window (never before now).
+  if(P){
+    const rO = R - ow/2;
+    ctx.beginPath(); ctx.strokeStyle=pal.track; ctx.lineWidth=ow; ctx.arc(c,c,rO,0,Math.PI*2); ctx.stroke();
+    if(pi.left>0 && !(CK && nowPos>=L)){
+      const fa = CK ? Math.max(L-pi.left, Math.min(L, Math.max(0,nowPos))) : Math.min(pi.used, L);
+      ctx.beginPath(); ctx.strokeStyle=S.play.color; ctx.lineWidth=ow;
+      ctx.arc(c,c,rO, ang(fa), -Math.PI/2+2*Math.PI); ctx.stroke();
+      ctx.save(); ctx.globalAlpha=0.25; ctx.strokeStyle='#ffffff'; ctx.lineWidth=ow;
+      const stripe=Math.max(L/60, 15000);
+      for(let q=Math.ceil(fa/stripe)*stripe; q<L; q+=stripe*2){ ctx.beginPath(); ctx.arc(c,c,rO, ang(q), ang(Math.min(q+stripe, L-1))); ctx.stroke(); }
+      ctx.restore();
+      // small end cap marking where the remaining time starts
+      const t=ang(fa); ctx.beginPath(); ctx.fillStyle=S.play.color; ctx.arc(c+Math.cos(t)*rO, c+Math.sin(t)*rO, ow*0.62, 0, Math.PI*2); ctx.fill();
+    } else if(pi.left<=0){
+      ctx.save(); ctx.globalAlpha=0.45; ctx.beginPath(); ctx.strokeStyle=pal.bad||'#c43d33'; ctx.lineWidth=ow; ctx.arc(c,c,rO,0,Math.PI*2); ctx.stroke(); ctx.restore();
+    }
+  }
+
+  pieces.forEach(([a,b,m])=>{
+    while(a<b && Math.floor(a/L)<laps){
       const k=Math.floor(a/L), lapEnd=(k+1)*L, pieceEnd=Math.min(b,lapEnd);
-      ctx.beginPath(); ctx.strokeStyle=colorOf(g.m); ctx.lineWidth=w;
+      ctx.beginPath(); ctx.strokeStyle=colorOf(m); ctx.lineWidth=w;
       const a0=ang(a), a1 = pieceEnd===lapEnd ? -Math.PI/2+2*Math.PI : ang(pieceEnd);
       ctx.arc(c,c,ringR(k),a0,a1+0.002); ctx.stroke();
       a=pieceEnd;
     }
   });
 
+  // ticks: labelled every `step` minutes; in clock mode aligned to real clock minutes
+  const step=[1,2,5,10,15,20,30,60,120].find(st=>Lmin/st<=12) || 120;
+  const minor = Lmin<=15 ? 0.5 : Lmin<=120 ? 1 : Lmin<=360 ? 5 : 15;
+  const base = CK ? clockStartMin() : 0;
   const tickOuter=R+size*0.02;
-  for(let i=0;i<60;i++){
-    const t=-Math.PI/2+i/60*Math.PI*2, major=i%5===0;
+  const lblFont = CK ? Math.round(size*0.025) : Math.round(size*0.028);
+  const near=(x,st)=>Math.abs(x/st-Math.round(x/st))<1e-6;
+  const firstMinor = ((minor - (base % minor)) % minor + minor) % minor;
+  const drawTick=(mins, major, label)=>{
+    const t=-Math.PI/2+mins/Lmin*Math.PI*2;
     const r1=R+size*0.004, r2=tickOuter+(major?size*0.012:0);
     ctx.beginPath(); ctx.strokeStyle=major?pal.ink:pal.muted; ctx.lineWidth=major?size*0.004:size*0.002;
     ctx.moveTo(c+Math.cos(t)*r1,c+Math.sin(t)*r1); ctx.lineTo(c+Math.cos(t)*r2,c+Math.sin(t)*r2); ctx.stroke();
-    if(major){
-      const mins=S.scaleMin*i/60, lbl = Number.isInteger(mins)? String(mins) : mins.toFixed(1);
-      const lr=tickOuter+size*0.04;
-      ctx.fillStyle=pal.muted; ctx.font=`600 ${Math.round(size*0.028)}px ${pal.mono}`;
+    if(label){
+      const lr=tickOuter+size*(longLbl?0.052:0.04);
+      ctx.fillStyle=pal.muted; ctx.font=`600 ${lblFont}px ${pal.mono}`;
       ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.fillText(lbl, c+Math.cos(t)*lr, c+Math.sin(t)*lr);
+      ctx.fillText(label, c+Math.cos(t)*lr, c+Math.sin(t)*lr);
     }
+  };
+  const elapsedLbl=m=> Lmin>60 ? `${Math.floor(m/60)}:${String(Math.round(m%60)).padStart(2,'0')}` : String(Math.round(m));
+  let drewZero=false;
+  for(let mins=firstMinor; mins<Lmin-1e-6; mins+=minor){
+    const major=near(base+mins, step);
+    if(mins<1e-6) drewZero=true;
+    drawTick(mins, major, major ? (CK ? clockShort(base+mins) : elapsedLbl(mins)) : '');
   }
+  if(!drewZero) drawTick(0, true, CK ? clockShort(base) : '0');   // start of the dial is always marked
 
   if(tot>0){
     const k=Math.min(laps-1, Math.floor(tot/L)), t=ang(tot), rr=ringR(k);
@@ -552,24 +813,70 @@ function drawWheel(ctx, size, pal, now){
     ctx.arc(c+Math.cos(t)*rr, c+Math.sin(t)*rr, w*0.22, 0, Math.PI*2); ctx.fill();
   }
 
-  const inner = ringR(laps-1) - w/2;
+  let inner = ringR(laps-1) - w/2;
+
+  // planner: inner ring(s) of planned tasks, in table order, on the same time scale
+  const PL=S.plan.on && S.plan.items.length>0;
+  if(S.plan.on){
+    const pt=planTotalMs(), pl=Math.min(3, Math.max(1, Math.ceil(pt/L)||1));
+    const pw=w*0.6, pg=size*0.018, prR=k=>inner - pg - pw/2 - k*(pw+size*0.008);
+    for(let k=0;k<pl;k++){ ctx.beginPath(); ctx.strokeStyle=pal.track; ctx.lineWidth=pw; ctx.arc(c,c,prR(k),0,Math.PI*2); ctx.stroke(); }
+    let cumP=0;
+    S.plan.items.forEach((it,idx)=>{
+      const d=Math.max(0,+it.min||0)*60000; if(!d) return;
+      let a=cumP, b=cumP+d; cumP=b;
+      const labelAt=(a+b)/2;
+      while(a<b && Math.floor(a/L)<pl){
+        const k=Math.floor(a/L), lapEnd=(k+1)*L, pe=Math.min(b,lapEnd);
+        ctx.beginPath(); ctx.strokeStyle=it.color; ctx.lineWidth=pw;
+        const a1 = pe===lapEnd ? -Math.PI/2+2*Math.PI : ang(pe);
+        ctx.arc(c,c,prR(k), ang(a), a1); ctx.stroke();
+        a=pe;
+      }
+      // separator + number label
+      const ks=Math.floor(cumP/L); if(ks<pl){ const t=ang(cumP); ctx.beginPath(); ctx.strokeStyle=pal.bg||pal.sep||'#ffffff'; ctx.lineWidth=Math.max(1.5,size*0.004);
+        const r=prR(ks); ctx.moveTo(c+Math.cos(t)*(r-pw/2),c+Math.sin(t)*(r-pw/2)); ctx.lineTo(c+Math.cos(t)*(r+pw/2),c+Math.sin(t)*(r+pw/2)); ctx.stroke(); }
+      const kl=Math.floor(labelAt/L), arcLen=(d/L)*2*Math.PI*prR(Math.min(kl,pl-1));
+      if(kl<pl && arcLen>pw*1.3){
+        const t=ang(labelAt), r=prR(kl);
+        ctx.fillStyle='#ffffff'; ctx.font=`700 ${Math.round(pw*0.62)}px ${pal.sans}`; ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(String(idx+1), c+Math.cos(t)*r, c+Math.sin(t)*r+1);
+      }
+    });
+    inner = prR(pl-1) - pw/2 - size*0.01;
+  }
+
+  const fitFont=(txt, weight, px, maxW, fam)=>{ let f=px; ctx.font=`${weight} ${f}px ${fam}`; while(f>8 && ctx.measureText(txt).width>maxW){ f-=1; ctx.font=`${weight} ${f}px ${fam}`; } };
   ctx.textAlign='center'; ctx.textBaseline='middle';
   const cm=curMode();
   const cur = cm ? labelOf(cm) : (S.finished ? 'Complete' : (S.segs.length ? 'Paused' : 'Ready'));
   ctx.fillStyle = cm ? colorOf(cm) : pal.muted;
-  ctx.font=`700 ${Math.round(Math.min(size*0.05, inner*0.24))}px ${pal.sans}`;
+  fitFont(cur, 700, Math.round(Math.min(size*0.05, inner*0.24)), inner*1.6, pal.sans);
   ctx.fillText(cur, c, c-inner*0.32);
-  ctx.fillStyle=pal.ink;
   ctx.font=`700 ${Math.round(Math.min(size*0.085, inner*0.36))}px ${pal.mono}`;
-  ctx.fillText(fmt(tot), c, c+inner*0.02);
-  ctx.fillStyle=pal.muted;
-  ctx.font=`500 ${Math.round(Math.min(size*0.03, inner*0.15))}px ${pal.sans}`;
-  ctx.fillText(laps>1 ? `total · ${laps} laps of ${S.scaleMin} min` : `total · ${S.scaleMin} min lap`, c, c+inner*0.34);
+  if(P){
+    ctx.fillStyle = pi.left>0 ? S.play.color : (pal.bad||pal.ink);
+    ctx.fillText(fmt(pi.left), c, c+inner*0.02);
+    ctx.fillStyle=pal.muted;
+    const fl=freeLabel();
+    fitFont(fl, 600, Math.round(Math.min(size*0.034, inner*0.16)), inner*1.7, pal.sans);
+    ctx.fillText(fl, c, c+inner*0.32);
+    if(pi.left<=0){ ctx.fillStyle=pal.bad||pal.ink; const ut = pi.over>=1000 ? `used up · ${fmt(pi.over)} over` : 'used up';
+      fitFont(ut, 600, Math.round(Math.min(size*0.03, inner*0.14)), inner*1.5, pal.sans); ctx.fillText(ut, c, c+inner*0.52); }
+    else { ctx.fillStyle=pal.muted; const tt=`total ${fmt(T.total)}`; fitFont(tt, 500, Math.round(Math.min(size*0.028, inner*0.13)), inner*1.5, pal.mono); ctx.fillText(tt, c, c+inner*0.52); }
+  } else {
+    ctx.fillStyle=pal.ink;
+    ctx.fillText(fmt(T.total), c, c+inner*0.02);
+    ctx.fillStyle=pal.muted;
+    const sub = CK ? clockRange() : (laps>1 ? `total · ${laps} laps of ${lapText(Lmin)}` : `total · ${lapText(Lmin)} lap`);
+    fitFont(sub, 500, Math.round(Math.min(size*0.03, inner*0.15)), inner*1.7, pal.sans);
+    ctx.fillText(sub, c, c+inner*0.34);
+  }
 }
 
 function screenPalette(){
   const cs=getComputedStyle(document.documentElement);
-  return {ink:cs.getPropertyValue('--ink').trim(), muted:cs.getPropertyValue('--muted').trim(), track:cs.getPropertyValue('--track').trim(),
+  return {ink:cs.getPropertyValue('--ink').trim(), muted:cs.getPropertyValue('--muted').trim(), track:cs.getPropertyValue('--track').trim(), bad:cs.getPropertyValue('--bad').trim(), sep:cs.getPropertyValue('--surface').trim(),
     bg:null, sans:'"Atkinson Hyperlegible", system-ui, sans-serif', mono:'"JetBrains Mono", ui-monospace, monospace'};
 }
 
@@ -580,7 +887,9 @@ function sizeCanvas(){ const r=cv.getBoundingClientRect(), dpr=window.devicePixe
 function tick(){
   const now=Date.now(), t=totals(now);
   drawWheel(cx, cv.width, screenPalette(), now);
-  $('totals').innerHTML =
+  const pi=playInfo(t);
+  $('totals').innerHTML = (S.play.on ? `<div class="trow play${pi.left>0?'':' out'}" style="--mc:${S.play.color}"><span class="sw"></span><span class="nm">${esc(freeLabel())}</span><span class="tm">${fmt(pi.left)}</span><span class="pc">of ${lapText(S.scaleMin).replace(' min','m').replace(' hr','h')}</span></div>` : '') +
+    (S.plan.on ? `<div class="trow plan"><span class="sw"></span><span class="nm">Planned time</span><span class="tm">${fmt(planTotalMs())}</span><span class="pc">${S.plan.items.length} task${S.plan.items.length===1?'':'s'}</span></div>` : '') +
     `<div class="trow total"><span class="sw"></span><span class="nm">Total time</span><span class="tm">${fmt(t.total)}</span><span class="pc">100%</span></div>` +
     shownModes(t).map(m=>`<div class="trow" style="--mc:${m.color}"><span class="sw"></span><span class="nm">${esc(labelOf(m.id))}${m.hidden?' <small>(removed)</small>':''}</span><span class="tm">${fmt(t[m.id])}</span><span class="pc">${t.total?pct(t[m.id],t.total):'—'}</span></div>`).join('');
   document.querySelectorAll('#logbody tr[data-i]').forEach(tr=>{ const i=+tr.dataset.i; if(S.segs[i]) tr.querySelector('.dur').textContent=fmt(segDur(i,now)); });
@@ -603,9 +912,9 @@ function exportPDF(){
   let y=M;
 
   doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor('#636b7a');
-  doc.text('TALLYTIME', M, y-4, {charSpace:1.2});
+  doc.text('GUIDE MY PLAN', M, y-4, {charSpace:1.2});
   doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor('#1d2330');
-  doc.text('On-Task / Off-Task Time Record', M, y+12); y+=36;
+  doc.text('Time Record', M, y+12); y+=36;
 
   const startT = S.segs.length ? clock(S.segs[0].s) : '—';
   const endT = S.segs.length ? (S.end!=null ? clock(S.end) : 'in progress') : '—';
@@ -619,23 +928,29 @@ function exportPDF(){
   const half=(W-2*M-20)/2;
   fieldLine('Date', S.date, M, y, half); fieldLine('Tracker', S.tracker, M+half+20, y, half); y+=24;
   fieldLine('Task', S.task, M, y, W-2*M); y+=24;
-  fieldLine('Time', `${startT} – ${endT}`, M, y, half); fieldLine('Wheel lap', `${S.scaleMin} min`, M+half+20, y, half); y+=24;
+  fieldLine('Time', `${startT} – ${endT}`, M, y, half); if(S.play.on){ const pp=playInfo(t); fieldLine(freeLabel(), `${fmt(pp.left)} of ${lapText(S.scaleMin)}`, M+half+20, y, half); }
+  else fieldLine('Wheel lap', lapText(S.scaleMin), M+half+20, y, half);
+  if(S.clock.on){ y+=24; fieldLine('Clock', clockRange(), M, y, half); }
+  y+=24;
 
   const off=document.createElement('canvas'); off.width=off.height=1100;
-  drawWheel(off.getContext('2d'), 1100, {ink:'#1d2330', muted:'#636b7a', track:'#e8ebf0', bg:'#ffffff',
+  drawWheel(off.getContext('2d'), 1100, {ink:'#1d2330', muted:'#636b7a', track:'#e8ebf0', bg:'#ffffff', bad:'#c43d33',
     sans:'"Atkinson Hyperlegible", Helvetica, Arial, sans-serif', mono:'"JetBrains Mono", Courier, monospace'}, now);
   const wSize=280;
   doc.addImage(off.toDataURL('image/png'), 'PNG', M-6, y, wSize, wSize);
 
   const fit=(txt,w)=>{ txt=String(txt); if(doc.getTextWidth(txt)<=w) return txt; while(txt.length>1 && doc.getTextWidth(txt+'…')>w) txt=txt.slice(0,-1); return txt+'…'; };
-  const rowsT=[['Total time','#1d2330',t.total,'100%'], ...shownModes(t).map(m=>[labelOf(m.id), m.color, t[m.id], pct(t[m.id],t.total)])];
+  const ppi=playInfo(t);
+  const rowsT=[...(S.play.on?[[freeLabel(), S.play.color, ppi.left, pct(ppi.left, ppi.blockMs)]]:[]), ['Total time','#1d2330',t.total,'100%'], ...shownModes(t).map(m=>[labelOf(m.id), m.color, t[m.id], pct(t[m.id],t.total)])];
   const step=Math.min(30, 240/rowsT.length);
   let tx=M+wSize+18, ty=y+Math.max(24, (wSize-step*rowsT.length)/2+10);
   doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor('#636b7a'); doc.text('TOTALS', tx, ty-14);
   rowsT.forEach(([l,col,ms,p],i)=>{
     doc.setFillColor(col); doc.roundedRect(tx, ty-8, 10, 10, 2, 2, 'F');
-    doc.setFont('helvetica', i===0?'bold':'normal'); doc.setFontSize(i===0?13:12); doc.setTextColor('#1d2330');
-    doc.text(fit(l, W-M-46-60-(tx+16)), tx+16, ty+1);
+    const isTot = l==='Total time';
+    doc.setFont('helvetica', isTot?'bold':'normal'); doc.setFontSize(isTot?13:12); doc.setTextColor('#1d2330');
+    const lw=W-M-46-58-(tx+16); let fs=isTot?13:12; while(fs>8.5 && doc.getTextWidth(l)>lw){ fs-=0.5; doc.setFontSize(fs); }
+    doc.text(fit(l, lw), tx+16, ty+1); doc.setFontSize(isTot?13:12);
     doc.setFont('courier','bold'); doc.text(fmt(ms), W-M-46, ty+1, {align:'right'});
     doc.setFont('courier','normal'); doc.setTextColor('#636b7a'); doc.text(p, W-M, ty+1, {align:'right'});
     doc.setDrawColor('#dde1e8'); doc.line(tx, ty+step*0.3, W-M, ty+step*0.3);
@@ -644,6 +959,10 @@ function exportPDF(){
   const counted=S.segs.filter(g=>g.m!==PZ).length, paused=S.segs.length-counted;
   doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor('#636b7a');
   doc.text(`${counted} segment${counted===1?'':'s'} recorded${paused?` · ${paused} pause${paused===1?'':'s'} (not counted)`:''}`, tx, ty+4);
+  if(S.play.on){
+    const names=S.modes.filter(m=>countsPlay(m.id) && (!m.hidden || t[m.id]>0)).map(m=>labelOf(m.id));
+    doc.text(doc.splitTextToSize(`Counts against ${freeLabel()}: ${names.join(', ')||'none'}`, W-M-tx), tx, ty+16);
+  }
 
   y+=wSize+18;
   doc.setFontSize(9); doc.setTextColor('#636b7a');
@@ -676,6 +995,22 @@ function exportPDF(){
   y+=20;
   if(y>720){ doc.addPage(); y=M; }
 
+  if(S.plan.on && S.plan.items.length){
+    doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor('#1d2330'); doc.text('Planned time', M, y); y+=16;
+    doc.setFontSize(9); doc.setTextColor('#636b7a'); doc.text('#',M,y); doc.text('TASK',M+24,y); doc.text('ESTIMATE',W-M,y,{align:'right'});
+    doc.setDrawColor('#dde1e8'); doc.line(M,y+5,W-M,y+5); y+=18;
+    S.plan.items.forEach((it,i)=>{
+      if(y>752){ doc.addPage(); y=M; }
+      doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor('#1d2330');
+      doc.setFillColor(it.color); doc.circle(M+3, y-3.5, 3.5, 'F'); doc.text(String(i+1), M+10, y);
+      doc.text(fit(it.task.trim()||'Untitled task', W-2*M-110), M+24, y);
+      doc.setFont('courier','normal'); doc.text(`${+it.min||0} min`, W-M, y, {align:'right'});
+      y+=16;
+    });
+    doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.text('Total planned', M+24, y); doc.setFont('courier','bold'); doc.text(fmt(planTotalMs()), W-M, y, {align:'right'});
+    y+=26; if(y>720){ doc.addPage(); y=M; }
+  }
+
   const head=()=>{ doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor('#636b7a');
     doc.text('#',M,y); doc.text('START',M+24,y); doc.text('MODE',M+108,y); doc.text('DURATION',M+188,y); doc.text('NOTE',M+262,y);
     doc.setDrawColor('#dde1e8'); doc.line(M,y+5,W-M,y+5); y+=18; };
@@ -698,8 +1033,108 @@ function exportPDF(){
   if(!S.segs.length){ doc.setFont('helvetica','italic'); doc.setFontSize(10); doc.text('No segments recorded.', M, y); }
 
   const safe=s=>String(s||'').trim().replace(/[^\w\-]+/g,'_').slice(0,40);
-  doc.save(`TallyTime_${safe(S.date)||'session'}${S.tracker?'_'+safe(S.tracker):''}.pdf`);
+  doc.save(`GuideMyPlan_${safe(S.date)||'session'}${S.tracker?'_'+safe(S.tracker):''}.pdf`);
 }
+
+/* ---------- setups (save / load configuration) ---------- */
+const PRESET_STORE='tallytime-setups-v1';
+function loadPresets(){ try{ const o=JSON.parse(localStorage.getItem(PRESET_STORE)); return o && typeof o==='object' ? o : {}; }catch(e){ return {}; } }
+function savePresets(o){ try{ localStorage.setItem(PRESET_STORE, JSON.stringify(o)); return true; }catch(e){ return false; } }
+const HEX=/^#[0-9a-f]{6}$/i;
+function currentConfig(){
+  return {app:'Guide My Plan', kind:'setup', version:1, savedAt:new Date().toISOString(),
+    modes:visibleModes().map(m=>({id:m.id, label:m.label, color:m.color, desc:m.desc||''})),
+    scaleMin:S.scaleMin, scaleUnit:S.scaleUnit, clock:{on:S.clock.on, start:S.clock.start},
+    play:{on:S.play.on, label:S.play.label, block:S.scaleMin, color:S.play.color, counts:{...S.play.counts}},
+    plan:{on:S.plan.on, items:S.plan.items.map(i=>({task:i.task, min:i.min, color:i.color}))}};
+}
+function cleanConfig(c){
+  if(!c || typeof c!=='object' || !Array.isArray(c.modes) || !c.modes.length) throw new Error('This file is not a Guide My Plan settings file.');
+  const seen=new Set();
+  const modes=c.modes.slice(0,MAX_MODES).map((m,i)=>{
+    let id=String(m.id||'m'+i).slice(0,40); while(seen.has(id) || id===PZ) id+='x'; seen.add(id);
+    return {id, label:String(m.label||'Mode '+(i+1)).slice(0,24), color:HEX.test(m.color)?m.color:NEW_COLORS[i%NEW_COLORS.length], desc:String(m.desc||'').slice(0,500)};
+  });
+  const p=c.play||{}, pl=c.plan||{};
+  return {modes,
+    scaleMin:(+c.scaleMin>=1 && +c.scaleMin<=720)?+c.scaleMin:60,
+    scaleUnit:c.scaleUnit==='hr'?'hr':'min',
+    clock:{on:!!(c.clock&&c.clock.on), start:(c.clock && /^\d{2}:\d{2}$/.test(c.clock.start)) ? c.clock.start : '16:30'},
+    play:{on:!!p.on, label:String(p.label||FREE_DEFAULT).slice(0,32), block:Math.min(240,Math.max(1,Math.round(+p.block)||60)), color:HEX.test(p.color)?p.color:'#57a6e8',
+      counts:Object.fromEntries(Object.entries(p.counts||{}).filter(([k,v])=>typeof v==='boolean'))},
+    plan:{on:!!pl.on, items:(Array.isArray(pl.items)?pl.items:[]).slice(0,50).map((it,i)=>({task:String(it.task||'').slice(0,60), min:Math.min(600,Math.max(1,Math.round(+it.min)||10)), color:HEX.test(it.color)?it.color:PLAN_COLORS[i%PLAN_COLORS.length]}))}};
+}
+function applyConfig(raw){
+  const c=cleanConfig(raw), ids=new Set(c.modes.map(m=>m.id));
+  // buttons not in the setup but already used in this session stay (hidden) so their time isn't lost
+  const keep=S.modes.filter(m=>!ids.has(m.id) && S.segs.some(g=>g.m===m.id)).map(m=>({...m, hidden:true}));
+  S.modes=[...c.modes, ...keep];
+  S.scaleMin=c.scaleMin; S.scaleUnit=c.scaleUnit; S.clock=c.clock; S.play=c.play; S.plan=c.plan;
+  let paused=false; const cm=curMode(); if(cm && modeById(cm).hidden){ pushRow(PZ, Date.now()); paused=true; }
+  editing=false; save(); syncFields(); buildModes(); renderPlay(); renderPlan(); renderStatic(true);
+  return paused;
+}
+function summary(c){
+  const parts=[`${c.modes.length} button${c.modes.length===1?'':'s'}: ${c.modes.map(m=>m.label).join(', ')}`];
+  if(c.clock && c.clock.on) parts.push(`clock from ${clockLong((()=>{const [h,m]=c.clock.start.split(':').map(Number); return h*60+m;})())}`);
+  if(c.play && c.play.on) parts.push(`${c.play.label||FREE_DEFAULT} on`); parts.unshift(`${lapText(c.scaleMin||60)} wheel`);
+  if(c.plan && c.plan.items && c.plan.items.length) parts.push(`${c.plan.items.length} planned task${c.plan.items.length===1?'':'s'}`);
+  return parts.join(' · ');
+}
+let setupMsgTimer=null;
+function setupMsg(t, kind){ const el=$('setupmsg'); el.textContent=t; el.className=kind||''; clearTimeout(setupMsgTimer); if(t) setupMsgTimer=setTimeout(()=>{ el.textContent=''; el.className=''; },7000); }
+function renderPresets(){
+  const P=loadPresets(), names=Object.keys(P).sort((a,b)=>a.localeCompare(b));
+  $('presetlist').innerHTML = names.length ? names.map(n=>`<div class="prow2"><span class="pn">${esc(n)}</span><span class="ps">${esc(summary(P[n]))}</span>
+      <span class="pa"><button type="button" class="btn small" data-load="${esc(n)}">Load</button><button type="button" class="ib del" data-del="${esc(n)}" aria-label="Delete setup ${esc(n)}">×</button></span></div>`).join('')
+    : '<div class="empty">No saved setups yet. Name the current setup below and save it.</div>';
+}
+function armed(btn, label, ms=3000){
+  if(btn.dataset.armed) return true;
+  const orig=btn.textContent; btn.dataset.armed='1'; btn.textContent=label; btn.classList.add('armed');
+  setTimeout(()=>{ if(btn.isConnected){ delete btn.dataset.armed; btn.textContent=orig; btn.classList.remove('armed'); } }, ms);
+  return false;
+}
+function afterLoad(name, paused){
+  setupMsg(`Loaded "${name}".`+(paused?' The button that was recording isn\'t in this setup, so the session is paused.':''), 'good');
+}
+$('b-setups').addEventListener('click',()=>{ renderPresets(); setupMsg(''); $('setups').showModal(); });
+$('b-closesetups').addEventListener('click',()=>$('setups').close());
+$('setups').addEventListener('click',e=>{ if(e.target===$('setups')) $('setups').close(); });   // click on backdrop
+$('saveform').addEventListener('submit',e=>{
+  e.preventDefault();
+  const name=$('preset-name').value.trim(); if(!name){ setupMsg('Type a name for this setup first.', 'bad'); $('preset-name').focus(); return; }
+  const P=loadPresets(), btn=$('b-savepreset');
+  if(P[name] && !armed(btn, `Replace "${name}"?`)) { setupMsg(`A setup named "${name}" already exists. Tap again to replace it.`); return; }
+  P[name]=currentConfig();
+  if(!savePresets(P)){ setupMsg('This browser blocked saving. Use "Download settings file" instead.', 'bad'); return; }
+  $('preset-name').value=''; renderPresets(); setupMsg(`Saved "${name}".`, 'good');
+});
+$('presetlist').addEventListener('click',e=>{
+  const lb=e.target.closest('[data-load]'), db=e.target.closest('[data-del]'), P=loadPresets();
+  if(lb){ const n=lb.dataset.load; try{ afterLoad(n, applyConfig(P[n])); }catch(err){ setupMsg(err.message, 'bad'); } }
+  if(db){ const n=db.dataset.del; if(!armed(db,'Delete?')) return; delete P[n]; savePresets(P); renderPresets(); setupMsg(`Deleted "${n}".`); }
+});
+$('b-download').addEventListener('click',()=>{
+  const blob=new Blob([JSON.stringify(currentConfig(), null, 2)], {type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  const d=new Date(), stamp=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  a.download=`GuideMyPlan-setup-${stamp}.json`; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+  setupMsg('Settings file downloaded.', 'good');
+});
+$('f-loadfile').addEventListener('change',e=>{
+  const f=e.target.files && e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{ try{ const c=JSON.parse(r.result); afterLoad(f.name, applyConfig(c)); }catch(err){ setupMsg(err instanceof SyntaxError ? 'That file couldn\'t be read. Choose a Guide My Plan settings file (.json).' : err.message, 'bad'); } e.target.value=''; };
+  r.onerror=()=>{ setupMsg('That file couldn\'t be read.', 'bad'); e.target.value=''; };
+  r.readAsText(f);
+});
+$('b-defaults').addEventListener('click',e=>{
+  if(!armed(e.currentTarget,'Tap again to restore defaults')) return;
+  const paused=applyConfig({modes:DEFAULT_MODES, scaleMin:60, scaleUnit:'min', clock:{on:false,start:'16:30'}, play:{on:false,label:FREE_DEFAULT,block:60,color:'#57a6e8',counts:{}}, plan:{on:false,items:[]}});
+  setupMsg('Default buttons and settings restored.'+(paused?' The session is paused because the recording button was removed.':''), 'good');
+});
 
 /* ---------- wire up ---------- */
 buildModes(); syncFields();
@@ -715,6 +1150,37 @@ $('legend').addEventListener('input',e=>{
 });
 $('legend').addEventListener('keydown',e=>{ if(e.key==='Enter' && !e.shiftKey && e.target.classList.contains('ldesc')){ e.preventDefault(); e.target.blur(); } });
 window.addEventListener('resize',()=>document.querySelectorAll('.ldesc').forEach(autosize));
+$('p-on').addEventListener('change',e=>{ S.play.on=e.target.checked; save(); renderPlay(); planSum(); tick(); });
+$('p-label').addEventListener('input',e=>{ S.play.label=e.target.value; save(); renderLap(); tick(); });
+$('p-label').addEventListener('blur',e=>{ if(!S.play.label.trim()){ S.play.label=FREE_DEFAULT; e.target.value=FREE_DEFAULT; save(); tick(); } renderPlay(); });
+$('p-label').addEventListener('keydown',e=>{ if(e.key==='Enter') e.target.blur(); });
+$('pl-on').addEventListener('change',e=>{ S.plan.on=e.target.checked; save(); renderPlan(); tick(); });
+$('b-addtask').addEventListener('click',addTask);
+const PB=$('planbody');
+PB.addEventListener('input',e=>{
+  const el=e.target, i=+el.dataset.i, f=el.dataset.f, it=S.plan.items[i]; if(!it || !f) return;
+  if(f==='task') it.task=el.value;
+  else if(f==='min'){ const v=Math.round(+el.value); if(v>=1 && v<=600) it.min=v; else return; }
+  else if(f==='color'){ it.color=el.value; el.parentElement.style.setProperty('--mc',it.color); el.closest('tr').style.setProperty('--mc',it.color); }
+  save(); planSum(); tick();
+});
+PB.addEventListener('focusout',e=>{ const el=e.target; if(el.dataset && el.dataset.f==='min'){ const it=S.plan.items[+el.dataset.i]; if(it) el.value=it.min; } });
+PB.addEventListener('keydown',e=>{ if(e.key==='Enter' && e.target.matches('input')) e.target.blur(); });
+PB.addEventListener('click',e=>{
+  const b=e.target.closest('button[data-act]'); if(!b) return; const i=+b.dataset.i, A=S.plan.items;
+  if(b.dataset.act==='up' && i>0){ [A[i-1],A[i]]=[A[i],A[i-1]]; }
+  else if(b.dataset.act==='down' && i<A.length-1){ [A[i+1],A[i]]=[A[i],A[i+1]]; }
+  else if(b.dataset.act==='del'){
+    if(!b.dataset.armed){ b.dataset.armed='1'; b.textContent='Delete?'; b.classList.add('armed'); setTimeout(()=>{ if(b.isConnected){ delete b.dataset.armed; b.textContent='×'; b.classList.remove('armed'); } },3000); return; }
+    A.splice(i,1);
+  } else return;
+  save(); renderPlan(); tick();
+});
+$('p-block').addEventListener('input',e=>{ const v=parseFloat(e.target.value); if(v>=1 && v<=720){ S.scaleMin=Math.round(v*10)/10; save(); planSum(); renderLap(); renderClock(); tick(); } });
+$('p-block').addEventListener('blur',e=>{ e.target.value=+S.scaleMin.toFixed(1); });
+$('p-block').addEventListener('keydown',e=>{ if(e.key==='Enter') e.target.blur(); });
+$('p-color').addEventListener('input',e=>{ S.play.color=e.target.value; e.target.parentElement.style.setProperty('--mc',S.play.color); save(); tick(); });
+$('p-counts').addEventListener('change',e=>{ const id=e.target.dataset.id; if(!id) return; S.play.counts[id]=e.target.checked; save(); tick(); });
 const LB=$('logbody');
 LB.addEventListener('input',e=>{
   const el=e.target, i=+el.dataset.i; if(Number.isNaN(i) || !S.segs[i]) return;
@@ -765,13 +1231,14 @@ $('b-stamp').addEventListener('click',()=>{
 });
 document.addEventListener('keydown',e=>{
   if(e.target.closest('input,select,textarea')) return;
+  if($('setups').open) return;
   const n=/^[1-9]$/.test(e.key) ? +e.key : 0, vm=visibleModes();
   if(n && n<=vm.length && !editing){ setMode(vm[n-1].id); e.preventDefault(); }
   if(e.code==='Space'){ pause(); e.preventDefault(); }
 });
 window.addEventListener('resize',()=>{ sizeCanvas(); tick(); });
 matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',tick);
-sizeCanvas(); save(); renderStatic(true); loop();
+sizeCanvas(); save(); renderPlay(); renderPlan(); renderStatic(true); loop();
 if(document.fonts) document.fonts.ready.then(tick);
 </script>
 </body>
