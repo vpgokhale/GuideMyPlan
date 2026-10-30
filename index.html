@@ -20,13 +20,15 @@
   :root{ --bg:#14171d; --surface:#1d212a; --ink:#e9ecf2; --muted:#9aa3b2; --line:#2e3441; --track:#2a303b; --focus:#7aa0ff; --pz:#5f6878; --bad:#ff7d72; color-scheme: dark; }
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{margin:0}
 body{background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:16px; line-height:1.4}
 .wrap{max-width:1360px; margin:0 auto; padding-block:20px 40px; padding-inline:16px; display:grid; gap:18px}
 header.top{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px}
 .topright{display:flex; flex-wrap:wrap; align-items:center; gap:8px 14px}
-dialog#setups{width:min(600px, calc(100% - 32px)); max-height:calc(100% - 48px); overflow:auto; border:1px solid var(--line); border-radius:14px; padding:18px 20px; background:var(--surface); color:var(--ink); box-shadow:0 20px 60px rgba(0,0,0,.25)}
-dialog#setups::backdrop{background:rgba(15,20,30,.45)}
+dialog.dlg{width:min(600px, calc(100% - 32px)); max-height:calc(100% - 48px); overflow:auto; border:1px solid var(--line); border-radius:14px; padding:18px 20px; background:var(--surface); color:var(--ink); box-shadow:0 20px 60px rgba(0,0,0,.25)}
+dialog.dlg.wide{width:min(860px, calc(100% - 32px))}
+dialog.dlg::backdrop{background:rgba(15,20,30,.45)}
 .dhead{display:flex; align-items:center; justify-content:space-between; gap:10px}
 .dhead h2{margin:0; font-size:1.2rem}
 #setups h3{font-size:.78rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:18px 0 8px}
@@ -43,6 +45,7 @@ dialog#setups::backdrop{background:rgba(15,20,30,.45)}
 .saverow input:focus{outline:none; border-color:var(--focus)}
 .filerow{display:flex; flex-wrap:wrap; gap:8px}
 label.btn{display:inline-flex; align-items:center}
+a.btn{display:inline-flex; align-items:center; text-decoration:none}
 #setupmsg{margin-top:14px; font-size:.9rem; color:var(--muted); min-height:1.3em}
 #setupmsg.bad{color:var(--bad); font-weight:700}
 #setupmsg.good{color:var(--ink); font-weight:700}
@@ -50,7 +53,7 @@ h1{font-size:1.45rem; margin:0; letter-spacing:.01em}
 .status{font-size:.9rem; color:var(--muted)}
 .status b{color:var(--ink)}
 
-.fields{display:grid; grid-template-columns:minmax(130px,1fr) minmax(150px,1.3fr) minmax(180px,2fr) auto auto; gap:12px;
+.fields{display:grid; grid-template-columns:minmax(120px,1fr) minmax(140px,1.2fr) minmax(160px,1.8fr) auto auto auto; gap:12px;
   background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px}
 .field{display:grid; gap:4px; min-width:0}
 .field label{font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:700}
@@ -59,13 +62,18 @@ h1{font-size:1.45rem; margin:0; letter-spacing:.01em}
 .field input:focus,.field select:focus{outline:none; border-bottom-color:var(--focus)}
 .field select option{background:var(--surface)}
 
-.main{display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr) minmax(0,.9fr); grid-template-areas:"wheel side park"; gap:18px; align-items:stretch}
+.main{display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr) minmax(0,1fr); grid-template-areas:"park wheel side"; gap:18px; align-items:stretch}
 .wheelbox{grid-area:wheel; align-self:start} .side{grid-area:side; align-self:start} .main .parking{grid-area:park}
 .wheelbox{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px; display:grid; place-items:center}
 #wheel{width:100%; max-width:520px; aspect-ratio:1/1; display:block}
 
-.side{display:grid; gap:14px; min-width:0}
-.modes{display:grid; gap:10px}
+.side{display:flex; flex-direction:column; gap:14px; min-width:0}
+.side .actions{margin-top:auto}
+.modes{display:grid; gap:10px; grid-auto-flow:column; grid-template-columns:repeat(var(--cols,1), minmax(0,1fr)); grid-template-rows:repeat(var(--rows,1), auto)}
+.modes .mode{min-width:0}
+.modes.compact .mode button.go{padding:10px 12px; font-size:1rem; gap:8px}
+.modes.compact .mode .dot{width:14px; height:14px}
+.modes.compact .mode .key{font-size:.7rem; padding:0 5px}
 .mode{display:grid; grid-template-columns:1fr auto; align-items:stretch; border-radius:12px; overflow:hidden;
   border:2px solid var(--mc); background:var(--surface)}
 .mode button.go{all:unset; cursor:pointer; display:flex; align-items:center; gap:12px; padding:16px 16px; font-size:1.15rem; font-weight:700; color:var(--ink)}
@@ -108,7 +116,6 @@ h1{font-size:1.45rem; margin:0; letter-spacing:.01em}
 .switch input:checked + .trk .knob{left:20px}
 .switch input:focus-visible + .trk{outline:3px solid var(--focus); outline-offset:2px}
 @media (prefers-reduced-motion:reduce){ .switch .trk,.switch .knob{transition:none} }
-.playset{display:grid; gap:8px; font-size:.92rem}
 .prow{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
 .prow.pstack{display:grid; justify-items:start; gap:6px}
 .prow label[for]{color:var(--muted); font-weight:700; font-size:.78rem; text-transform:uppercase; letter-spacing:.08em}
@@ -128,8 +135,14 @@ h1{font-size:1.45rem; margin:0; letter-spacing:.01em}
 .swlabel:hover{border-bottom-color:var(--muted)}
 .swlabel:focus{outline:none; border-color:var(--focus); border-radius:6px; background:var(--bg)}
 .swname{font-weight:700}
-.planner{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px; min-width:0}
-.planner h2{font-size:1rem; margin:0}
+.topmenu{display:flex; gap:8px}
+.badge{display:inline-grid; place-items:center; min-width:1.4em; height:1.4em; margin-left:6px; padding:0 5px; border-radius:999px; background:var(--ink); color:var(--bg); font-size:.75rem; font-family:var(--mono)}
+.pscroll{margin-top:12px; max-height:min(55vh, 460px)}
+.dfoot{display:flex; justify-content:flex-end; margin-top:14px}
+.dfoot.gap{gap:8px}
+.legend.inlg{border:0; padding:0; margin-top:22px; background:transparent}
+.legend.inlg h3{font-size:1rem; margin:0; text-transform:none; letter-spacing:0; color:var(--ink)}
+#resultsdlg .totals{margin-top:12px}
 .ptable{min-width:560px}
 .ptable td.ptask{width:60%}
 .ptable td.ptask input{font:inherit; font-size:.92rem; color:var(--ink); background:transparent; width:100%; min-width:0; border:1px solid var(--line); border-radius:6px; padding:5px 8px}
@@ -141,6 +154,10 @@ h1{font-size:1.45rem; margin:0; letter-spacing:.01em}
 .pfoot b{color:var(--ink); font-family:var(--mono)}
 .trow.plan .sw{background:repeating-linear-gradient(45deg, var(--muted) 0 2px, transparent 2px 4px); border:1px solid var(--muted)}
 .field select:disabled,.field input:disabled{opacity:.5}
+.remfield .cpick.sm{margin-left:0}
+.field input.flabel-in{font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:700; border:0; border-bottom:1.5px dashed var(--line); padding:0 0 1px; width:auto; min-width:0; max-width:16em; field-sizing:content}
+.field input.flabel-in:hover{border-bottom-color:var(--muted)}
+.field input.flabel-in:focus{color:var(--ink); border-bottom:1.5px solid var(--focus)}
 .flabel{font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:700}
 .lapgrp{display:flex; align-items:flex-end; gap:6px}
 .lapgrp input{width:4.6em; font-family:var(--mono)}
@@ -155,7 +172,7 @@ h1{font-size:1.45rem; margin:0; letter-spacing:.01em}
 .trow .sw{width:12px; height:12px; border-radius:3px; background:var(--mc)}
 .trow .nm{font-weight:700}
 .trow .tm{font-family:var(--mono); font-variant-numeric:tabular-nums; font-size:1.15rem}
-.trow .pc{font-family:var(--mono); font-variant-numeric:tabular-nums; color:var(--muted); width:4.2em; text-align:right; font-size:.9rem}
+.trow .pc{font-family:var(--mono); font-variant-numeric:tabular-nums; color:var(--muted); min-width:4.2em; white-space:nowrap; text-align:right; font-size:.9rem}
 .trow.total .tm{font-size:1.5rem; font-weight:700}
 .trow.total .sw{background:var(--ink)}
 
@@ -171,7 +188,7 @@ h1{font-size:1.45rem; margin:0; letter-spacing:.01em}
 .parking h2{font-size:1rem; margin:0}
 .parking .hint{font-size:.85rem; color:var(--muted)}
 .parking textarea{font:inherit; color:var(--ink); background:var(--bg); border:1.5px solid var(--line); border-radius:10px;
-  padding:10px 12px; min-height:180px; flex:1; resize:vertical; width:100%; line-height:1.5}
+  padding:10px 12px; min-height:120px; flex:1; resize:none; width:100%; line-height:1.5}
 .parking textarea:focus{outline:none; border-color:var(--focus)}
 .parking .btn{padding:7px 12px; font-size:.9rem}
 .log{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px; min-width:0}
@@ -211,8 +228,14 @@ td.rowact{white-space:nowrap; text-align:right; width:1%}
 .legend{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px; min-width:0}
 .legend h2{font-size:1rem; margin:0}
 #legend{display:grid}
-.lrow{display:grid; grid-template-columns:minmax(9em, 14em) minmax(0,1fr); gap:6px 14px; align-items:start; padding:8px 0; border-bottom:1px solid var(--line)}
-.lname{display:flex; align-items:center; gap:8px; min-width:0; padding-top:6px}
+.lrow{display:grid; grid-template-columns:minmax(12em, 17em) minmax(0,1fr) auto; gap:6px 12px; align-items:start; padding:8px 0; border-bottom:1px solid var(--line)}
+.lname{display:flex; align-items:center; gap:8px; min-width:0}
+.lnin{font:inherit; font-weight:700; color:var(--ink); background:transparent; border:1px solid var(--line); border-radius:6px; padding:5px 8px; min-width:0; flex:1}
+.lnin:focus{outline:none; border-color:var(--focus); background:var(--bg)}
+.cpick.xs{width:26px; height:26px; margin:0; flex:none}
+.lname .nokey{opacity:.6}
+#keymsg{font-size:.88rem}
+#keymsg.bad{color:var(--bad); font-weight:700}
 .lname i{width:12px; height:12px; border-radius:50%; background:var(--mc); flex:none}
 .lname b{min-width:0; overflow-wrap:anywhere}
 .lname .key{margin-left:auto}
@@ -224,11 +247,11 @@ td.rowact{white-space:nowrap; text-align:right; width:1%}
 .legend-foot{font-size:.85rem; color:var(--muted); padding-top:10px}
 .legend-foot b{color:var(--ink)}
 .lname .key, .mode .key{font-family:var(--mono); font-size:.75rem; color:var(--muted); border:1px solid var(--line); border-radius:5px; padding:1px 6px}
-@media (max-width:560px){ .lrow{grid-template-columns:1fr} .lname .key{margin-left:6px} }
+@media (max-width:560px){ .lrow{grid-template-columns:minmax(0,1fr) auto} .lrow .ldesc{grid-column:1 / -1; grid-row:2} .lname .key{margin-left:6px} }
 .sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
 
 @media (max-width:1100px){
-  .main{grid-template-columns:minmax(0,1fr) minmax(0,1fr); grid-template-areas:"wheel wheel" "side park"}
+  .main{grid-template-columns:minmax(0,1fr) minmax(0,1fr); grid-template-areas:"wheel wheel" "park side"}
   #wheel{max-width:460px}
 }
 @media (max-width:820px){
@@ -248,12 +271,33 @@ td.rowact{white-space:nowrap; text-align:right; width:1%}
 <div class="wrap">
   <header class="top">
     <h1>Guide My Plan</h1>
-    <div class="topright"><div class="status" id="status">Ready. Press a mode to start.</div><button type="button" class="btn small" id="b-setups">Setups</button></div>
+    <div class="topright"><div class="status" id="status">Ready. Press a button to start.</div><nav class="topmenu" aria-label="Menus"><button type="button" class="btn small" id="b-planner">Planner<span class="badge" id="plancount" hidden></span></button><button type="button" class="btn small" id="b-results">Session Summary</button><button type="button" class="btn small" id="b-setups">Settings</button><a class="btn small" id="b-support" href="https://forms.gle/FunqxruAm5zLpUJ58" target="_blank" rel="noopener noreferrer">Get Support</a></nav></div>
   </header>
 
-  <dialog id="setups" aria-labelledby="setups-h">
-    <div class="dhead"><h2 id="setups-h">Setups</h2><button type="button" class="ib" id="b-closesetups" aria-label="Close">×</button></div>
-    <p class="dnote">A setup saves your buttons (names, colors, descriptions), the wheel lap, clock display, Free Time settings and planned tasks. Loading one doesn't change the current session's times, log or notes.</p>
+  <dialog id="plannerdlg" class="dlg wide" aria-labelledby="planner-h">
+    <div class="dhead"><h2 id="planner-h">Planner</h2><button type="button" class="ib" id="b-closeplanner" aria-label="Close">×</button></div>
+    <p class="dnote">List tasks in order with an estimate. They fill the inner ring of the wheel, and each task gets its own button in the same color. Remaining time comes after the last task.</p>
+    <div class="logscroll pscroll"><table class="ptable"><thead><tr><th>#</th><th>Task</th><th>Estimate</th><th>Color</th><th><span class="sr">Edit</span></th></tr></thead><tbody id="planbody"></tbody></table></div>
+    <div class="pfoot"><button type="button" class="btn small" id="b-addtask">+ Add task</button><span id="plansum"></span><span id="planmsg" role="status" aria-live="polite"></span></div>
+    <section class="legend inlg" aria-labelledby="legend-h">
+      <div class="loghead"><h3 id="legend-h">Buttons</h3><span class="loghint">Rename, recolor or remove a button, and click a description to edit it. Keys renumber automatically.</span></div>
+      <div id="legend"></div>
+      <div class="pfoot"><button type="button" class="btn small" id="b-addmode">+ Add button</button><span id="keymsg" role="status" aria-live="polite"></span></div>
+      <div class="legend-foot"><b>Paused</b> rows stop the clock and are not counted. Press a button's number key to switch, <b>Space</b> to pause, or tap the active button again to pause.</div>
+    </section>
+    <div class="dfoot"><button type="button" class="btn small primary" id="b-doneplanner">Done</button></div>
+  </dialog>
+
+  <dialog id="resultsdlg" class="dlg" aria-labelledby="results-h">
+    <div class="dhead"><h2 id="results-h">Session Summary</h2><button type="button" class="ib" id="b-closeresults" aria-label="Close">×</button></div>
+    <p class="dnote" id="resultsnote"></p>
+    <div class="totals" id="totals"></div>
+    <div class="dfoot gap"><button type="button" class="btn small" id="b-pdf2">Export PDF</button><button type="button" class="btn small primary" id="b-doneresults">Done</button></div>
+  </dialog>
+
+  <dialog id="setups" class="dlg" aria-labelledby="setups-h">
+    <div class="dhead"><h2 id="setups-h">Settings</h2><button type="button" class="ib" id="b-closesetups" aria-label="Close">×</button></div>
+    <p class="dnote">A setup saves your buttons (names, colors, descriptions), the wheel lap, clock display, remaining-time settings and planned tasks. Loading one doesn't change the current session's times, log or notes.</p>
 
     <h3>Saved in this browser</h3>
     <div id="presetlist" class="presetlist"></div>
@@ -293,6 +337,14 @@ td.rowact{white-space:nowrap; text-align:right; width:1%}
       </div>
       <span class="fnote" id="clocknote"></span>
     </div>
+    <div class="field remfield">
+      <input id="p-label" class="flabel-in" type="text" maxlength="32" title="Click to rename" aria-label="Name for remaining time" autocomplete="off">
+      <div class="clockgrp">
+        <label class="switch"><input type="checkbox" id="p-on" role="switch" aria-label="Display Remaining Time"><span class="trk"><span class="knob"></span></span></label>
+        <label class="cpick sm" title="Color for remaining time"><input type="color" id="p-color" aria-label="Color for remaining time"></label>
+      </div>
+      <span class="fnote"></span>
+    </div>
   </section>
 
   <section class="main">
@@ -300,30 +352,10 @@ td.rowact{white-space:nowrap; text-align:right; width:1%}
 
     <div class="side">
       <div class="modes" id="modes"></div>
-      <div id="modemsg" role="status" aria-live="polite"></div>
 
-      <div class="playbox">
-        <div class="swrow"><label class="switch"><input type="checkbox" id="p-on" role="switch" aria-label="Free Time Remaining mode"><span class="trk"><span class="knob"></span></span></label><input id="p-label" class="swlabel" type="text" maxlength="32" title="Click to rename" aria-label="Name for this timer" autocomplete="off"></div>
-        <div class="playset" id="playset" hidden>
-          <div class="prow">
-            <label for="p-block">Time block</label>
-            <span class="pnum"><input id="p-block" type="number" min="1" max="720" step="any" inputmode="decimal"> min</span>
-            <label class="cpick sm" title="Color"><input type="color" id="p-color" aria-label="Color for this timer"></label>
-          </div>
-          <div class="prow pstack"><span class="plbl">Counts against it:</span><span id="p-counts" class="pchips"></span></div>
-          <div class="phint">Time remaining = time block minus the time on the checked buttons. The time block is the same as the wheel lap. Click the name to rename it.</div>
-        </div>
-      </div>
 
-      <div class="playbox">
-        <div class="swrow"><label class="switch"><input type="checkbox" id="pl-on" role="switch" aria-label="Planner mode"><span class="trk"><span class="knob"></span></span></label><span class="swname">Planner mode</span></div>
-        <div class="phint" id="plhint" hidden>Planned tasks show as an inner ring on the wheel. Edit them in the Planned time table below.</div>
-      </div>
-
-      <div class="totals" id="totals"></div>
 
       <div class="actions">
-        <button class="btn" id="b-pause">Pause</button>
         <button class="btn primary" id="b-finish">Finish session</button>
         <button class="btn" id="b-pdf">Export PDF</button>
         <button class="btn warn" id="b-reset">Reset</button>
@@ -341,11 +373,6 @@ td.rowact{white-space:nowrap; text-align:right; width:1%}
   </section>
 
 
-  <section class="planner" id="planner" hidden>
-    <div class="loghead"><h2>Planned time</h2><span class="loghint">List tasks in order with an estimate. They fill the inner ring of the wheel on the same time scale.</span></div>
-    <div class="logscroll"><table class="ptable"><thead><tr><th>#</th><th>Task</th><th>Estimate</th><th>Color</th><th><span class="sr">Edit</span></th></tr></thead><tbody id="planbody"></tbody></table></div>
-    <div class="pfoot"><button type="button" class="btn small" id="b-addtask">+ Add task</button><span id="plansum"></span></div>
-  </section>
 
   <section class="log">
     <div class="loghead"><h2>Segment log</h2><span class="loghint">Fix mistakes here: change a start time or mode, add a row with +, or delete with ×. Each row runs until the next row starts.</span></div>
@@ -353,18 +380,12 @@ td.rowact{white-space:nowrap; text-align:right; width:1%}
     <div id="logmsg" role="status" aria-live="polite"></div>
   </section>
 
-  <section class="legend" aria-labelledby="legend-h">
-    <div class="loghead"><h2 id="legend-h">Button key</h2><span class="loghint">Matches the buttons above. Click a description to edit it.</span></div>
-    <div id="legend"></div>
-    <div class="legend-foot"><b>Paused</b> rows stop the clock and are not counted. Press a button's number key to switch, <b>Space</b> to pause, or tap the active button again to pause.</div>
-  </section>
 </div>
 
 <script>
 const PZ = 'pz';
 const DEFAULT_MODES = [
-  {id:'on',  label:'Planned',  color:'#2e9a68', desc:'Includes everything that contributes to completing the task.'},
-  {id:'off', label:'Unplanned', color:'#d2544a', desc:'Includes everything that causes a delay in completing the task, including unnecessary comments, questions, actions, and spontaneous breaks.'},
+  {id:'off', label:'Off-Task', color:'#d2544a', desc:'Includes everything that causes a delay in completing the task, including unnecessary comments, questions, actions, and spontaneous breaks.'},
   {id:'brk', label:'Break',    color:'#e3a23a', desc:'A planned break.'}
 ];
 const DESC_PH = '<Enter description>';
@@ -402,17 +423,36 @@ if(!Array.isArray(S.modes)){
   delete S.colors;
 }
 // rename the old default button names (only if never customised)
-S.modes.forEach(m=>{ if(m.id==='on' && m.label==='On task') m.label='Planned'; if(m.id==='off' && m.label==='Off task') m.label='Unplanned'; });
+S.modes.forEach(m=>{ if(m.id==='on' && ['On task','Planned'].includes(m.label)) m.label='On-Task'; if(m.id==='off' && ['Off task','Unplanned'].includes(m.label)) m.label='Off-Task'; });
+// On-Task is no longer a default button (planned tasks replace it). Remove it once; time already recorded on it is kept.
+if(!S.noOnTask){
+  const on=S.modes.find(m=>m.id==='on' && m.label==='On-Task');
+  if(on){
+    const last=S.segs[S.segs.length-1];
+    if(!S.finished && last && last.m==='on') S.segs.push({m:'pz', s:Date.now(), note:''});
+    if(S.segs.some(g=>g.m==='on')) on.hidden=true; else S.modes=S.modes.filter(m=>m!==on);
+  }
+  S.noOnTask=true;
+}
 S.modes.forEach(m=>{ if(typeof m.desc!=='string'){ const d=DEFAULT_MODES.find(x=>x.id===m.id && x.label===m.label); m.desc = d ? d.desc : ''; } });
 if(!S.segs.length) S.date = todayStr();     // a new (unstarted) session always opens on today's date
 if(!S.play || typeof S.play!=='object') S.play={on:false, block:60, color:'#57a6e8', counts:{}};
-const FREE_DEFAULT='Time Remaining';
+const FREE_DEFAULT='Display Remaining Time';
 if(S.scaleUnit!=='hr' && S.scaleUnit!=='min') S.scaleUnit='min';
 if(!(S.scaleMin>0)) S.scaleMin=60;
 if(!S.clock || typeof S.clock!=='object') S.clock={on:false, start:'16:30'};
-if(typeof S.play.label!=='string' || S.play.label==='Free Time Remaining') S.play.label=FREE_DEFAULT;
+if(typeof S.play.label!=='string' || ['Free Time Remaining','Time Remaining','Free Choice'].includes(S.play.label)) S.play.label=FREE_DEFAULT;
 const PLAN_COLORS=['#7c9cbf','#b08fc7','#7fb59a','#d6a26b','#c98a8a','#8ab0b8','#a8a86a','#9a8fd1'];
-if(!S.plan || typeof S.plan!=='object') S.plan={on:false, items:[]};
+if(!S.plan || typeof S.plan!=='object') S.plan={items:[]};
+if(!Array.isArray(S.plan.items)) S.plan.items=[];
+// each planned task is linked to its own button (mode with plan:true); the task name and color live on the button
+S.plan.items = S.plan.items.map((it,i)=>{
+  if(it.mode && S.modes.some(m=>m.id===it.mode)) return {mode:it.mode, min:+it.min||10};
+  const id='p'+Date.now().toString(36)+i;
+  S.modes.push({id, label:(it.task||'').trim()||('Task '+(i+1)), color:it.color||PLAN_COLORS[i%PLAN_COLORS.length], desc:'', plan:true});
+  return {mode:id, min:+it.min||10};
+});
+delete S.plan.on;
 let editing = false;
 
 /* ---------- helpers ---------- */
@@ -424,7 +464,12 @@ function timeVal(t){ const d=new Date(t); return [d.getHours(),d.getMinutes(),d.
 function segEnd(i, now){ return i < S.segs.length-1 ? S.segs[i+1].s : (S.end ?? now); }
 function segDur(i, now){ return Math.max(0, segEnd(i, now) - S.segs[i].s); }
 function curMode(){ if(S.finished || !S.segs.length) return null; const m=S.segs[S.segs.length-1].m; return m===PZ ? null : m; }
-function visibleModes(){ return S.modes.filter(m=>!m.hidden); }
+function visibleModes(){
+  const manual=S.modes.filter(m=>!m.hidden && !m.plan);
+  const planned=S.plan.items.map(it=>S.modes.find(m=>m.id===it.mode)).filter(m=>m && !m.hidden);
+  return [...manual, ...planned];
+}
+function manualCount(){ return S.modes.filter(m=>!m.hidden && !m.plan).length; }
 function modeById(id){ return S.modes.find(m=>m.id===id); }
 function labelOf(id){ if(id===PZ) return 'Paused'; const m=modeById(id); return m ? (m.label.trim() || 'Untitled') : 'Unknown'; }
 function colorOf(id, pdf){ if(id===PZ) return pdf ? PZ_PDF : 'var(--pz)'; const m=modeById(id); return m ? m.color : '#888888'; }
@@ -439,13 +484,19 @@ function clockLong(min){ const t=hm(min); return `${t.h12}:${String(t.mm).padSta
 function clockStartMin(){ const [h,m]=String(S.clock.start||'16:30').split(':').map(Number); return (h||0)*60+(m||0); }
 function clockStartTs(){ const base=S.segs.length ? new Date(S.segs[0].s) : new Date(); const sm=clockStartMin(); base.setHours(Math.floor(sm/60), sm%60, 0, 0); return base.getTime(); }
 function clockRange(){ const a=clockStartMin(); return `${clockLong(a)} – ${clockLong(a+lapMin())}`; }
-function freeLabel(){ return (S.play.label||'').trim() || FREE_DEFAULT; }
+function switchLabel(){ return (S.play.label||'').trim() || FREE_DEFAULT; }
+// the name shown next to the number (wheel, totals, PDF): "Display Remaining Time" reads as "Remaining Time"
+function freeLabel(){ return switchLabel().replace(/^display\s+/i,'') || 'Remaining Time'; }
 function planTotalMs(){ return S.plan.items.reduce((a,it)=>a+Math.max(0,+it.min||0)*60000,0); }
-function countsPlay(id){ return S.play.counts[id] !== false; }
+function countsPlay(id){ return true; }   // every button and the Planner count against Free Choice
+// planned time still left on tasks: each task's estimate minus the time already recorded on its button
+function planRemainingMs(t){ return S.plan.items.reduce((a,it)=>a+Math.max(0,(+it.min||0)*60000-(t[it.mode]||0)),0); }
+// Free Choice = time block − time used on the checked buttons − planned time still left on tasks
 function playInfo(t){
   const blockMs=S.scaleMin*60000;
   const used=S.modes.reduce((a,m)=>a+(countsPlay(m.id)?(t[m.id]||0):0),0);
-  return {blockMs, used, left:Math.max(0,blockMs-used), over:Math.max(0,used-blockMs)};
+  const rem=planRemainingMs(t), need=used+rem;
+  return {blockMs, used, rem, left:Math.max(0,blockMs-need), over:Math.max(0,need-blockMs)};
 }
 function totals(now){
   const t={total:0}; S.modes.forEach(m=>t[m.id]=0);
@@ -530,61 +581,49 @@ function deleteRow(i){
 /* ---------- mode buttons (editable) ---------- */
 let modeMsgTimer=null;
 function modeMsg(text, bad){
-  const el=$('modemsg'); el.textContent=text; el.classList.toggle('bad',!!bad);
+  const el=$('keymsg'); el.textContent=text; el.classList.toggle('bad',!!bad);
   clearTimeout(modeMsgTimer); if(text) modeMsgTimer=setTimeout(()=>{ el.textContent=''; },6000);
+}
+// fill one column down to the bottom of the wheel, then continue in a new column (up to 3)
+function layoutModes(){
+  const box=$('modes'), n=box.children.length; if(!n) return;
+  const wheel=document.querySelector('.wheelbox'), side=document.querySelector('.side');
+  const set=(cols, compact)=>{ box.style.setProperty('--cols',cols); box.style.setProperty('--rows',Math.ceil(n/cols)); box.classList.toggle('compact', compact ?? cols>1); };
+  side.style.minHeight='';
+  const park=document.querySelector('.main .parking'); park.style.height=''; park.style.alignSelf='';
+  const wr=wheel.getBoundingClientRect(), sr=side.getBoundingClientRect(), pr=park.getBoundingClientRect();
+  const sideBySide=(a,b)=>Math.abs(a.top-b.top)<40 && (a.left>=b.right-1 || a.right<=b.left+1);
+  if(sideBySide(pr,wr)){ park.style.height=wr.height+'px'; park.style.alignSelf='start'; }   // parking lot ends level with the wheel
+  const besideWheel = sideBySide(sr,wr);
+  if(!besideWheel){ set(n>4 ? 2 : 1); return; }
+  const wh=wheel.getBoundingClientRect().height;
+  // one column first (full size, then compact); split evenly into more columns only if it would run past the wheel
+  for(const [cols, compact] of [[1,false],[1,true],[2,true],[3,true]]){
+    set(cols, compact);
+    if(side.getBoundingClientRect().height <= wh + 1) break;
+  }
+  side.style.minHeight = wh+'px';      // action buttons sit level with the bottom of the wheel
 }
 function buildModes(){
   const box=$('modes'); box.innerHTML='';
-  const vm=visibleModes();
-  vm.forEach(m=>{
+  visibleModes().forEach(m=>{
     const k=keyOf(m.id);
-    const row=document.createElement('div'); row.className='mode'+(editing?' editing':''); row.id='mode-'+m.id;
+    const row=document.createElement('div'); row.className='mode'; row.id='mode-'+m.id;
     row.style.setProperty('--mc', m.color);
-    if(!editing){
-      row.innerHTML=`<button class="go" id="go-${m.id}"><span class="dot"></span><span class="lbltxt">${esc(labelOf(m.id))}</span>${k?`<span class="key">${k}</span>`:''}</button>`;
-      row.querySelector('.go').addEventListener('click',()=>setMode(m.id));
-    } else {
-      row.innerHTML=`<label class="cpick" title="Choose color"><input type="color" id="c-${m.id}" value="${m.color}" aria-label="Color for ${esc(labelOf(m.id))}"></label>
-        <input class="lbl" id="l-${m.id}" type="text" maxlength="24" value="${esc(m.label)}" aria-label="Button name" autocomplete="off">
-        ${k?`<span class="key">${k}</span>`:'<span class="key nokey" title="Only the first 9 buttons get keys">–</span>'}
-        <button type="button" class="ib del" id="x-${m.id}" title="Remove this button" aria-label="Remove ${esc(labelOf(m.id))}">×</button>`;
-      row.querySelector('input[type=color]').addEventListener('input',e=>{ m.color=e.target.value; row.style.setProperty('--mc',m.color); save(); renderStatic(); });
-      const li=row.querySelector('.lbl');
-      li.addEventListener('focus',()=>{ li.dataset.orig=m.label; });
-      li.addEventListener('input',e=>{ m.label=e.target.value; save(); renderStatic(); renderLegend(); renderPlay(); });
-      li.addEventListener('blur',e=>{
-        if(!m.label.trim()){ m.label='Mode '+(vm.indexOf(m)+1); e.target.value=m.label; }
-        if(li.dataset.orig!==undefined && m.label.trim()!==li.dataset.orig.trim() && m.desc){
-          m.desc=''; modeMsg(`"${labelOf(m.id)}" renamed. Its description in the key below was cleared so you can write a new one.`);
-        }
-        delete li.dataset.orig; save(); renderStatic(); renderLegend();
-      });
-      li.addEventListener('keydown',e=>{ if(e.key==='Enter') e.target.blur(); });
-      const xb=row.querySelector('.del');
-      xb.addEventListener('click',()=>{
-        if(!xb.dataset.armed){ xb.dataset.armed='1'; xb.textContent='Remove?'; xb.classList.add('armed');
-          setTimeout(()=>{ if(xb.isConnected){ delete xb.dataset.armed; xb.textContent='×'; xb.classList.remove('armed'); } },3000); return; }
-        removeMode(m.id);
-      });
-    }
+    row.innerHTML=`<button class="go" id="go-${m.id}"><span class="dot"></span><span class="lbltxt">${esc(labelOf(m.id))}</span>${k?`<span class="key">${k}</span>`:''}</button>`;
+    row.querySelector('.go').addEventListener('click',()=>setMode(m.id));
     box.appendChild(row);
   });
-  const tools=document.createElement('div'); tools.className='modetools';
-  tools.innerHTML = editing
-    ? `<button type="button" class="btn small" id="b-addmode"${vm.length>=MAX_MODES?' disabled':''}>+ Add button</button><button type="button" class="btn small primary" id="b-editmodes">Done</button>`
-    : `<button type="button" class="btn small ghost" id="b-editmodes">Edit buttons</button>`;
-  box.appendChild(tools);
-  $('b-editmodes').addEventListener('click',()=>{ editing=!editing; buildModes(); renderStatic(); modeMsg(editing?'Rename, recolor, add or remove buttons. Keys renumber automatically.':''); });
-  if(editing) $('b-addmode').addEventListener('click',addMode);
+  layoutModes();
   renderLegend(); renderPlay();
 }
 function addMode(){
-  const vm=visibleModes(); if(vm.length>=MAX_MODES){ modeMsg(`You can have up to ${MAX_MODES} buttons.`, true); return; }
+  if(manualCount()>=MAX_MODES){ modeMsg(`You can have up to ${MAX_MODES} buttons, plus one for each planned task.`, true); return; }
   const used=new Set(S.modes.map(m=>m.color.toLowerCase()));
   const color=NEW_COLORS.find(c=>!used.has(c)) || NEW_COLORS[S.modes.length % NEW_COLORS.length];
   const id='m'+Date.now().toString(36);
   S.modes.push({id, label:'New mode', color, desc:''});
-  save(); buildModes(); renderStatic();
+  save(); buildModes(); renderStatic(); renderLegend(true);
   const li=$('l-'+id); if(li){ li.focus(); li.select(); }
   modeMsg(`Button added with key ${keyOf(id)||'(none)'}. Type a name for it.`);
 }
@@ -593,55 +632,65 @@ function removeMode(id){
   if(vm.length<=1){ modeMsg('Keep at least one button.', true); return; }
   if(curMode()===id){ modeMsg('This button is recording right now. Switch to another button or pause first.', true); buildModes(); return; }
   const name=labelOf(id), used=S.segs.some(g=>g.m===id);
+  if(modeById(id).plan){ S.plan.items=S.plan.items.filter(it=>it.mode!==id); }
   if(used) modeById(id).hidden=true; else S.modes=S.modes.filter(m=>m.id!==id);
-  save(); buildModes(); renderStatic();
+  save(); buildModes(); renderPlan(); renderStatic();
   modeMsg(used ? `"${name}" removed from the buttons. Its time stays in the log and totals.` : `"${name}" removed. Keys renumbered.`);
 }
 function autosize(ta){ ta.style.height='auto'; ta.style.height=ta.scrollHeight+'px'; }
 function renderPlan(){
-  $('pl-on').checked=S.plan.on; $('planner').hidden=!S.plan.on; $('plhint').hidden=!S.plan.on;
   const pb=$('planbody');
-  if(!S.plan.items.length){ pb.innerHTML='<tr><td colspan="5" class="empty">No tasks yet. Add the tasks you expect to do and how long each should take.</td></tr>'; }
-  else pb.innerHTML=S.plan.items.map((it,i)=>`<tr data-i="${i}" style="--mc:${it.color}">
+  if(pb.contains(document.activeElement) && document.activeElement.matches('input[type=text],input[type=number]')) return;   // don't interrupt typing
+  if(!S.plan.items.length){ pb.innerHTML='<tr><td colspan="5" class="empty">No tasks yet. Add the tasks you expect to do and how long each should take. Each task also gets its own button.</td></tr>'; }
+  else pb.innerHTML=S.plan.items.map((it,i)=>{ const m=modeById(it.mode)||{label:'',color:'#888888'}; return `<tr data-i="${i}" style="--mc:${m.color}">
       <td class="num">${i+1}</td>
-      <td class="ptask"><input id="pt-${i}" data-i="${i}" data-f="task" type="text" maxlength="60" placeholder="Task name" value="${esc(it.task)}" aria-label="Task ${i+1} name" autocomplete="off"></td>
+      <td class="ptask"><input id="pt-${i}" data-i="${i}" data-f="task" type="text" maxlength="24" placeholder="Task name" value="${esc(m.label)}" aria-label="Task ${i+1} name" autocomplete="off"></td>
       <td><span class="pnum"><input id="pm-${i}" data-i="${i}" data-f="min" type="number" min="1" max="600" step="1" inputmode="numeric" value="${+it.min||''}" aria-label="Task ${i+1} estimate in minutes"> min</span></td>
-      <td><label class="cpick sm" style="--mc:${it.color}" title="Task color"><input type="color" data-i="${i}" data-f="color" value="${it.color}" aria-label="Task ${i+1} color"></label></td>
-      <td class="rowact"><button type="button" class="ib" data-act="up" data-i="${i}" title="Move up" aria-label="Move task ${i+1} up"${i===0?' disabled':''}>↑</button><button type="button" class="ib" data-act="down" data-i="${i}" title="Move down" aria-label="Move task ${i+1} down"${i===S.plan.items.length-1?' disabled':''}>↓</button><button type="button" class="ib del" data-act="del" data-i="${i}" title="Delete task" aria-label="Delete task ${i+1}">×</button></td>
-    </tr>`).join('');
+      <td><label class="cpick sm" style="--mc:${m.color}" title="Task and button color"><input type="color" data-i="${i}" data-f="color" value="${m.color}" aria-label="Task ${i+1} color"></label></td>
+      <td class="rowact"><button type="button" class="ib" data-act="up" data-i="${i}" title="Move up" aria-label="Move task ${i+1} up"${i===0?' disabled':''}>↑</button><button type="button" class="ib" data-act="down" data-i="${i}" title="Move down" aria-label="Move task ${i+1} down"${i===S.plan.items.length-1?' disabled':''}>↓</button><button type="button" class="ib del" data-act="del" data-i="${i}" title="Delete task and its button" aria-label="Delete task ${i+1}">×</button></td>
+    </tr>`; }).join('');
   planSum();
 }
+function planBadge(){ const n=S.plan.items.length, b=$('plancount'); b.textContent=n; b.hidden=!n; $('b-planner').setAttribute('aria-label', n ? `Planner, ${n} task${n===1?'':'s'}` : 'Planner'); }
 function planSum(){
+  planBadge();
   const tot=planTotalMs(), lm=lapMin();
   let txt=`Total planned: <b>${fmt(tot)}</b>`;
   if(tot > lm*60000) txt += ` · longer than one ${lapText(lm)} lap, so it continues on another inner ring`;
   $('plansum').innerHTML=txt;
 }
 function addTask(){
-  const used=new Set(S.plan.items.map(i=>i.color));
+  const used=new Set(S.modes.map(m=>m.color.toLowerCase()));
   const color=PLAN_COLORS.find(c=>!used.has(c)) || PLAN_COLORS[S.plan.items.length%PLAN_COLORS.length];
-  S.plan.items.push({task:'', min:10, color}); save(); renderPlan(); tick();
-  const el=$('pt-'+(S.plan.items.length-1)); if(el) el.focus();
+  const id='p'+Date.now().toString(36);
+  S.modes.push({id, label:'Task '+(S.plan.items.length+1), color, desc:'', plan:true});
+  S.plan.items.push({mode:id, min:10}); save(); buildModes(); renderPlan(); renderStatic();
+  const el=$('pt-'+(S.plan.items.length-1)); if(el){ el.focus(); el.select(); }
 }
 function renderPlay(){
-  $('p-on').checked=S.play.on; $('playset').hidden=!S.play.on;
+  $('p-on').checked=S.play.on;
   if(document.activeElement!==$('p-label')) $('p-label').value=S.play.label;
-  $('p-on').setAttribute('aria-label', freeLabel()+' mode');
-  if(document.activeElement!==$('p-block')) $('p-block').value=+S.scaleMin.toFixed(1); $('p-color').value=S.play.color;
-  $('p-color').parentElement.style.setProperty('--mc', S.play.color);
+  $('p-on').setAttribute('aria-label', switchLabel());
+  $('p-color').value=S.play.color; $('p-color').parentElement.style.setProperty('--mc', S.play.color);
   renderLap(); renderClock();
-  $('p-counts').innerHTML = visibleModes().map(m=>`<label class="pchip" style="--mc:${m.color}"><input type="checkbox" data-id="${m.id}"${countsPlay(m.id)?' checked':''}><i></i>${esc(labelOf(m.id))}</label>`).join('');
 }
-function renderLegend(){
+function renderLegend(force){
   const box=$('legend'); if(!box) return;
-  if(box.contains(document.activeElement) && document.activeElement.tagName==='TEXTAREA') return;   // don't interrupt typing
+  const ae=document.activeElement;
+  if(!force && box.contains(ae) && (ae.tagName==='TEXTAREA' || (ae.tagName==='INPUT' && ae.type==='text'))) return;   // don't interrupt typing
   box.innerHTML = visibleModes().map(m=>{
     const k=keyOf(m.id);
-    return `<div class="lrow" style="--mc:${m.color}">
-      <div class="lname"><i></i><b>${esc(labelOf(m.id))}</b>${k?`<span class="key">${k}</span>`:''}</div>
+    return `<div class="lrow" data-id="${m.id}" style="--mc:${m.color}">
+      <div class="lname">
+        <label class="cpick xs" title="Button color"><input type="color" data-id="${m.id}" value="${m.color}" aria-label="Color for ${esc(labelOf(m.id))}"></label>
+        <input class="lnin" id="l-${m.id}" data-id="${m.id}" type="text" maxlength="24" value="${esc(m.label)}" aria-label="Button name" autocomplete="off">
+        ${k?`<span class="key" title="Keyboard key">${k}</span>`:'<span class="key nokey" title="Only the first 9 buttons get keys">–</span>'}
+      </div>
       <textarea class="ldesc" id="d-${m.id}" data-id="${m.id}" rows="1" placeholder="${esc(DESC_PH)}" aria-label="Description for ${esc(labelOf(m.id))}">${esc(m.desc||'')}</textarea>
+      <button type="button" class="ib del" data-rm="${m.id}" title="${m.plan?'Remove this task and its button':'Remove this button'}" aria-label="Remove ${esc(labelOf(m.id))}">×</button>
     </div>`; }).join('');
   box.querySelectorAll('textarea').forEach(autosize);
+  const ab=$('b-addmode'); if(ab) ab.disabled = manualCount()>=MAX_MODES;
 }
 
 function syncFields(){
@@ -655,15 +704,14 @@ function renderLap(){
   u.value=S.scaleUnit;
   if(document.activeElement!==f) f.value = S.scaleUnit==='hr' ? +(S.scaleMin/60).toFixed(2) : +S.scaleMin.toFixed(1);
   f.disabled=u.disabled=false;
-  $('lapnote').textContent = S.play.on ? `Also the ${freeLabel()} time block` : '';
-  const pb=$('p-block'); if(pb && document.activeElement!==pb) pb.value=+S.scaleMin.toFixed(1);
+  $('lapnote').textContent = '';
 }
 function renderClock(){
   $('c-on').checked=S.clock.on; $('clockset').hidden=!S.clock.on;
   if(document.activeElement!==$('c-start')) $('c-start').value=S.clock.start;
   $('clocknote').textContent = S.clock.on ? `Ends ${clockLong(clockStartMin()+lapMin())}` : '';
 }
-function lapChanged(){ save(); renderClock(); if(document.activeElement!==$('p-block')) $('p-block').value=+S.scaleMin.toFixed(1); if($('plansum')) planSum(); tick(); }
+function lapChanged(){ save(); renderClock(); if($('plansum')) planSum(); tick(); }
 $('f-scale').addEventListener('input',e=>{
   const v=parseFloat(e.target.value); if(!(v>0)) return;
   const m = S.scaleUnit==='hr' ? v*60 : v;
@@ -688,7 +736,6 @@ function renderStatic(scrollToEnd){
     row.classList.toggle('active',!editing && cur===m.id);
     row.classList.toggle('disabled',S.finished && !editing);
   }
-  $('b-pause').disabled = !cur;
   $('b-finish').disabled = S.finished || !S.segs.length;
 
   const tb=$('logbody');
@@ -736,9 +783,7 @@ function drawWheel(ctx, size, pal, now){
   const usable = R*0.58;
   const w = Math.min(size*0.085, usable/laps*0.82);
   const gap = Math.min(size*0.012, usable/laps*0.18);
-  const ow = size*0.032, og = size*0.014;               // Time Remaining outer ring
-  const off0 = P ? ow+og : 0;
-  const ringR = k => R - off0 - w/2 - k*(w+gap);
+  const ringR = k => R - w/2 - k*(w+gap);
   const ang = t => -Math.PI/2 + 2*Math.PI*((t%L)/L);
   const tot = nowPos;
 
@@ -748,25 +793,13 @@ function drawWheel(ctx, size, pal, now){
   ctx.lineCap='butt';
   for(let k=0;k<laps;k++){ ctx.beginPath(); ctx.strokeStyle=pal.track; ctx.lineWidth=w; ctx.arc(c,c,ringR(k),0,Math.PI*2); ctx.stroke(); }
 
-  // Time Remaining: a thin outer ring. Full ring = the time block; the colored part is what's left.
-  // Elapsed mode: it runs from the time used to the end. Clock mode: it is the last part of the window (never before now).
-  if(P){
-    const rO = R - ow/2;
-    ctx.beginPath(); ctx.strokeStyle=pal.track; ctx.lineWidth=ow; ctx.arc(c,c,rO,0,Math.PI*2); ctx.stroke();
-    if(pi.left>0 && !(CK && nowPos>=L)){
-      const fa = CK ? Math.max(L-pi.left, Math.min(L, Math.max(0,nowPos))) : Math.min(pi.used, L);
-      ctx.beginPath(); ctx.strokeStyle=S.play.color; ctx.lineWidth=ow;
-      ctx.arc(c,c,rO, ang(fa), -Math.PI/2+2*Math.PI); ctx.stroke();
-      ctx.save(); ctx.globalAlpha=0.25; ctx.strokeStyle='#ffffff'; ctx.lineWidth=ow;
-      const stripe=Math.max(L/60, 15000);
-      for(let q=Math.ceil(fa/stripe)*stripe; q<L; q+=stripe*2){ ctx.beginPath(); ctx.arc(c,c,rO, ang(q), ang(Math.min(q+stripe, L-1))); ctx.stroke(); }
-      ctx.restore();
-      // small end cap marking where the remaining time starts
-      const t=ang(fa); ctx.beginPath(); ctx.fillStyle=S.play.color; ctx.arc(c+Math.cos(t)*rO, c+Math.sin(t)*rO, ow*0.62, 0, Math.PI*2); ctx.fill();
-    } else if(pi.left<=0){
-      ctx.save(); ctx.globalAlpha=0.45; ctx.beginPath(); ctx.strokeStyle=pal.bad||'#c43d33'; ctx.lineWidth=ow; ctx.arc(c,c,rO,0,Math.PI*2); ctx.stroke(); ctx.restore();
-    }
-  }
+  // ghost of the plan on the tracking ring: planned tasks (and Free Choice) drawn faintly underneath what is recorded
+  const planSegs=[]; { let cp=0; S.plan.items.forEach(it=>{ const d=Math.max(0,+it.min||0)*60000; if(d){ planSegs.push([cp,cp+d,colorOf(it.mode),it]); cp+=d; } });
+    if(P && pi.left>0) planSegs.push([cp, cp+pi.left, S.play.color, null]); }
+  const arcPieces=(a,b,maxLap,fn)=>{ while(a<b && Math.floor(a/L)<maxLap){ const k=Math.floor(a/L), lapEnd=(k+1)*L, pe=Math.min(b,lapEnd); fn(k, ang(a), pe===lapEnd ? -Math.PI/2+2*Math.PI : ang(pe)); a=pe; } };
+  ctx.save(); ctx.globalAlpha=0.22;
+  planSegs.forEach(([a,b,col])=>arcPieces(a,b,laps,(k,a0,a1)=>{ ctx.beginPath(); ctx.strokeStyle=col; ctx.lineWidth=w; ctx.arc(c,c,ringR(k),a0,a1); ctx.stroke(); }));
+  ctx.restore();
 
   pieces.forEach(([a,b,m])=>{
     while(a<b && Math.floor(a/L)<laps){
@@ -816,8 +849,7 @@ function drawWheel(ctx, size, pal, now){
   let inner = ringR(laps-1) - w/2;
 
   // planner: inner ring(s) of planned tasks, in table order, on the same time scale
-  const PL=S.plan.on && S.plan.items.length>0;
-  if(S.plan.on){
+  if(S.plan.items.length || P){
     const pt=planTotalMs(), pl=Math.min(3, Math.max(1, Math.ceil(pt/L)||1));
     const pw=w*0.6, pg=size*0.018, prR=k=>inner - pg - pw/2 - k*(pw+size*0.008);
     for(let k=0;k<pl;k++){ ctx.beginPath(); ctx.strokeStyle=pal.track; ctx.lineWidth=pw; ctx.arc(c,c,prR(k),0,Math.PI*2); ctx.stroke(); }
@@ -828,7 +860,7 @@ function drawWheel(ctx, size, pal, now){
       const labelAt=(a+b)/2;
       while(a<b && Math.floor(a/L)<pl){
         const k=Math.floor(a/L), lapEnd=(k+1)*L, pe=Math.min(b,lapEnd);
-        ctx.beginPath(); ctx.strokeStyle=it.color; ctx.lineWidth=pw;
+        ctx.beginPath(); ctx.strokeStyle=colorOf(it.mode); ctx.lineWidth=pw;
         const a1 = pe===lapEnd ? -Math.PI/2+2*Math.PI : ang(pe);
         ctx.arc(c,c,prR(k), ang(a), a1); ctx.stroke();
         a=pe;
@@ -843,6 +875,17 @@ function drawWheel(ctx, size, pal, now){
         ctx.fillText(String(idx+1), c+Math.cos(t)*r, c+Math.sin(t)*r+1);
       }
     });
+    // Free Choice: right after the last task, as long as the time left over
+    if(P && pi.left>0){
+      const fa=pt, fb=pt+pi.left;
+      arcPieces(fa, fb, pl, (k,a0,a1)=>{
+        ctx.beginPath(); ctx.strokeStyle=S.play.color; ctx.lineWidth=pw; ctx.arc(c,c,prR(k),a0,a1); ctx.stroke();
+      });
+      ctx.save(); ctx.globalAlpha=0.3; ctx.strokeStyle='#ffffff'; ctx.lineWidth=pw;
+      const stripe=Math.max(L/60, 15000);
+      for(let q=Math.ceil(fa/stripe)*stripe; q<fb; q+=stripe*2) arcPieces(q, Math.min(q+stripe,fb), pl, (k,a0,a1)=>{ ctx.beginPath(); ctx.arc(c,c,prR(k),a0,a1); ctx.stroke(); });
+      ctx.restore();
+    }
     inner = prR(pl-1) - pw/2 - size*0.01;
   }
 
@@ -889,15 +932,15 @@ function tick(){
   drawWheel(cx, cv.width, screenPalette(), now);
   const pi=playInfo(t);
   $('totals').innerHTML = (S.play.on ? `<div class="trow play${pi.left>0?'':' out'}" style="--mc:${S.play.color}"><span class="sw"></span><span class="nm">${esc(freeLabel())}</span><span class="tm">${fmt(pi.left)}</span><span class="pc">of ${lapText(S.scaleMin).replace(' min','m').replace(' hr','h')}</span></div>` : '') +
-    (S.plan.on ? `<div class="trow plan"><span class="sw"></span><span class="nm">Planned time</span><span class="tm">${fmt(planTotalMs())}</span><span class="pc">${S.plan.items.length} task${S.plan.items.length===1?'':'s'}</span></div>` : '') +
+    (S.plan.items.length ? `<div class="trow plan"><span class="sw"></span><span class="nm">Planner</span><span class="tm">${fmt(planTotalMs())}</span><span class="pc">${S.plan.items.length} task${S.plan.items.length===1?'':'s'}</span></div>` : '') +
     `<div class="trow total"><span class="sw"></span><span class="nm">Total time</span><span class="tm">${fmt(t.total)}</span><span class="pc">100%</span></div>` +
     shownModes(t).map(m=>`<div class="trow" style="--mc:${m.color}"><span class="sw"></span><span class="nm">${esc(labelOf(m.id))}${m.hidden?' <small>(removed)</small>':''}</span><span class="tm">${fmt(t[m.id])}</span><span class="pc">${t.total?pct(t[m.id],t.total):'—'}</span></div>`).join('');
   document.querySelectorAll('#logbody tr[data-i]').forEach(tr=>{ const i=+tr.dataset.i; if(S.segs[i]) tr.querySelector('.dur').textContent=fmt(segDur(i,now)); });
   const st=$('status'), cm=curMode();
   if(S.finished && S.segs.length) st.innerHTML=`<b>Session complete</b> · ${clock(S.segs[0].s)} – ${clock(S.end)}`;
   else if(cm) st.innerHTML=`Recording <b>${esc(labelOf(cm))}</b> · started ${clock(S.segs[0].s)}`;
-  else if(S.segs.length) st.innerHTML='<b>Paused</b> · press a mode to continue';
-  else st.textContent='Ready. Press a mode to start.';
+  else if(S.segs.length) st.innerHTML='<b>Paused</b> · press a button to continue';
+  else st.textContent='Ready. Press a button to start.';
 }
 let lastSec=-1;
 function loop(){ const s=Math.floor(Date.now()/250); if(s!==lastSec){ lastSec=s; tick(); } requestAnimationFrame(loop); }
@@ -960,8 +1003,7 @@ function exportPDF(){
   doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor('#636b7a');
   doc.text(`${counted} segment${counted===1?'':'s'} recorded${paused?` · ${paused} pause${paused===1?'':'s'} (not counted)`:''}`, tx, ty+4);
   if(S.play.on){
-    const names=S.modes.filter(m=>countsPlay(m.id) && (!m.hidden || t[m.id]>0)).map(m=>labelOf(m.id));
-    doc.text(doc.splitTextToSize(`Counts against ${freeLabel()}: ${names.join(', ')||'none'}`, W-M-tx), tx, ty+16);
+    doc.text(doc.splitTextToSize(`${freeLabel()} = wheel time − time used − planned time still left`, W-M-tx), tx, ty+16);
   }
 
   y+=wSize+18;
@@ -995,15 +1037,15 @@ function exportPDF(){
   y+=20;
   if(y>720){ doc.addPage(); y=M; }
 
-  if(S.plan.on && S.plan.items.length){
-    doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor('#1d2330'); doc.text('Planned time', M, y); y+=16;
+  if(S.plan.items.length){
+    doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor('#1d2330'); doc.text('Planner', M, y); y+=16;
     doc.setFontSize(9); doc.setTextColor('#636b7a'); doc.text('#',M,y); doc.text('TASK',M+24,y); doc.text('ESTIMATE',W-M,y,{align:'right'});
     doc.setDrawColor('#dde1e8'); doc.line(M,y+5,W-M,y+5); y+=18;
     S.plan.items.forEach((it,i)=>{
       if(y>752){ doc.addPage(); y=M; }
       doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor('#1d2330');
-      doc.setFillColor(it.color); doc.circle(M+3, y-3.5, 3.5, 'F'); doc.text(String(i+1), M+10, y);
-      doc.text(fit(it.task.trim()||'Untitled task', W-2*M-110), M+24, y);
+      doc.setFillColor(colorOf(it.mode,true)); doc.circle(M+3, y-3.5, 3.5, 'F'); doc.text(String(i+1), M+10, y);
+      doc.text(fit(labelOf(it.mode), W-2*M-110), M+24, y);
       doc.setFont('courier','normal'); doc.text(`${+it.min||0} min`, W-M, y, {align:'right'});
       y+=16;
     });
@@ -1043,26 +1085,39 @@ function savePresets(o){ try{ localStorage.setItem(PRESET_STORE, JSON.stringify(
 const HEX=/^#[0-9a-f]{6}$/i;
 function currentConfig(){
   return {app:'Guide My Plan', kind:'setup', version:1, savedAt:new Date().toISOString(),
-    modes:visibleModes().map(m=>({id:m.id, label:m.label, color:m.color, desc:m.desc||''})),
+    modes:visibleModes().map(m=>({id:m.id, label:m.label, color:m.color, desc:m.desc||'', ...(m.plan?{plan:true}:{})})),
     scaleMin:S.scaleMin, scaleUnit:S.scaleUnit, clock:{on:S.clock.on, start:S.clock.start},
     play:{on:S.play.on, label:S.play.label, block:S.scaleMin, color:S.play.color, counts:{...S.play.counts}},
-    plan:{on:S.plan.on, items:S.plan.items.map(i=>({task:i.task, min:i.min, color:i.color}))}};
+    plan:{items:S.plan.items.map(i=>({mode:i.mode, min:i.min}))}};
 }
 function cleanConfig(c){
   if(!c || typeof c!=='object' || !Array.isArray(c.modes) || !c.modes.length) throw new Error('This file is not a Guide My Plan settings file.');
-  const seen=new Set();
-  const modes=c.modes.slice(0,MAX_MODES).map((m,i)=>{
-    let id=String(m.id||'m'+i).slice(0,40); while(seen.has(id) || id===PZ) id+='x'; seen.add(id);
-    return {id, label:String(m.label||'Mode '+(i+1)).slice(0,24), color:HEX.test(m.color)?m.color:NEW_COLORS[i%NEW_COLORS.length], desc:String(m.desc||'').slice(0,500)};
+  const seen=new Set(), idMap={};
+  let manualN=0;
+  const modes=c.modes.filter(m=>m && (m.plan || manualN++ < MAX_MODES)).slice(0,MAX_MODES+40).map((m,i)=>{
+    let id=String(m.id||'m'+i).slice(0,40); while(seen.has(id) || id===PZ) id+='x'; seen.add(id); idMap[String(m.id)]=id;
+    return {id, label:String(m.label||'Mode '+(i+1)).slice(0,24), color:HEX.test(m.color)?m.color:NEW_COLORS[i%NEW_COLORS.length], desc:String(m.desc||'').slice(0,500), ...(m.plan?{plan:true}:{})};
   });
   const p=c.play||{}, pl=c.plan||{};
+  const items=[];
+  (Array.isArray(pl.items)?pl.items:[]).slice(0,40).forEach((it,i)=>{
+    const min=Math.min(600,Math.max(1,Math.round(+it.min)||10));
+    if(it.mode!=null && idMap[String(it.mode)]){ const id=idMap[String(it.mode)]; const m=modes.find(x=>x.id===id); m.plan=true; items.push({mode:id, min}); }
+    else if(it.task!==undefined){   // older files: tasks stored their own name and color
+      let id='p'+i+Date.now().toString(36); while(seen.has(id)) id+='x'; seen.add(id);
+      modes.push({id, label:String(it.task||'Task '+(i+1)).slice(0,24)||('Task '+(i+1)), color:HEX.test(it.color)?it.color:PLAN_COLORS[i%PLAN_COLORS.length], desc:'', plan:true});
+      items.push({mode:id, min});
+    }
+  });
+  modes.forEach(m=>{ if(m.plan && !items.some(it=>it.mode===m.id)) delete m.plan; });
+  if(!modes.some(m=>!m.plan)) throw new Error('This settings file has no buttons.');
   return {modes,
     scaleMin:(+c.scaleMin>=1 && +c.scaleMin<=720)?+c.scaleMin:60,
     scaleUnit:c.scaleUnit==='hr'?'hr':'min',
     clock:{on:!!(c.clock&&c.clock.on), start:(c.clock && /^\d{2}:\d{2}$/.test(c.clock.start)) ? c.clock.start : '16:30'},
     play:{on:!!p.on, label:String(p.label||FREE_DEFAULT).slice(0,32), block:Math.min(240,Math.max(1,Math.round(+p.block)||60)), color:HEX.test(p.color)?p.color:'#57a6e8',
       counts:Object.fromEntries(Object.entries(p.counts||{}).filter(([k,v])=>typeof v==='boolean'))},
-    plan:{on:!!pl.on, items:(Array.isArray(pl.items)?pl.items:[]).slice(0,50).map((it,i)=>({task:String(it.task||'').slice(0,60), min:Math.min(600,Math.max(1,Math.round(+it.min)||10)), color:HEX.test(it.color)?it.color:PLAN_COLORS[i%PLAN_COLORS.length]}))}};
+    plan:{items}};
 }
 function applyConfig(raw){
   const c=cleanConfig(raw), ids=new Set(c.modes.map(m=>m.id));
@@ -1075,7 +1130,8 @@ function applyConfig(raw){
   return paused;
 }
 function summary(c){
-  const parts=[`${c.modes.length} button${c.modes.length===1?'':'s'}: ${c.modes.map(m=>m.label).join(', ')}`];
+  const man=c.modes.filter(m=>!m.plan);
+  const parts=[`${man.length} button${man.length===1?'':'s'}: ${man.map(m=>m.label).join(', ')}`];
   if(c.clock && c.clock.on) parts.push(`clock from ${clockLong((()=>{const [h,m]=c.clock.start.split(':').map(Number); return h*60+m;})())}`);
   if(c.play && c.play.on) parts.push(`${c.play.label||FREE_DEFAULT} on`); parts.unshift(`${lapText(c.scaleMin||60)} wheel`);
   if(c.plan && c.plan.items && c.plan.items.length) parts.push(`${c.plan.items.length} planned task${c.plan.items.length===1?'':'s'}`);
@@ -1098,6 +1154,21 @@ function armed(btn, label, ms=3000){
 function afterLoad(name, paused){
   setupMsg(`Loaded "${name}".`+(paused?' The button that was recording isn\'t in this setup, so the session is paused.':''), 'good');
 }
+$('b-planner').addEventListener('click',()=>{ renderPlan(); planMsg(''); $('plannerdlg').showModal(); if(!S.plan.items.length) $('b-addtask').focus(); });
+$('b-closeplanner').addEventListener('click',()=>$('plannerdlg').close());
+$('b-doneplanner').addEventListener('click',()=>$('plannerdlg').close());
+$('plannerdlg').addEventListener('click',e=>{ if(e.target===$('plannerdlg')) $('plannerdlg').close(); });
+function resultsNote(){
+  const n=$('resultsnote'); if(!n) return;
+  if(!S.segs.length){ n.textContent='Nothing recorded yet.'; return; }
+  n.textContent = S.finished ? `Session ${clock(S.segs[0].s)} – ${clock(S.end)}` : `Session in progress since ${clock(S.segs[0].s)}. Times update live.`;
+}
+$('b-results').addEventListener('click',()=>{ tick(); resultsNote(); $('resultsdlg').showModal(); });
+$('b-closeresults').addEventListener('click',()=>$('resultsdlg').close());
+$('b-doneresults').addEventListener('click',()=>$('resultsdlg').close());
+$('b-pdf2').addEventListener('click',()=>exportPDF());
+$('resultsdlg').addEventListener('click',e=>{ if(e.target===$('resultsdlg')) $('resultsdlg').close(); });
+$('b-planner').addEventListener('click',()=>{ renderLegend(); });
 $('b-setups').addEventListener('click',()=>{ renderPresets(); setupMsg(''); $('setups').showModal(); });
 $('b-closesetups').addEventListener('click',()=>$('setups').close());
 $('setups').addEventListener('click',e=>{ if(e.target===$('setups')) $('setups').close(); });   // click on backdrop
@@ -1132,55 +1203,87 @@ $('f-loadfile').addEventListener('change',e=>{
 });
 $('b-defaults').addEventListener('click',e=>{
   if(!armed(e.currentTarget,'Tap again to restore defaults')) return;
-  const paused=applyConfig({modes:DEFAULT_MODES, scaleMin:60, scaleUnit:'min', clock:{on:false,start:'16:30'}, play:{on:false,label:FREE_DEFAULT,block:60,color:'#57a6e8',counts:{}}, plan:{on:false,items:[]}});
+  const paused=applyConfig({modes:DEFAULT_MODES, scaleMin:60, scaleUnit:'min', clock:{on:false,start:'16:30'}, play:{on:false,label:FREE_DEFAULT,block:60,color:'#57a6e8',counts:{}}, plan:{items:[]}});
   setupMsg('Default buttons and settings restored.'+(paused?' The session is paused because the recording button was removed.':''), 'good');
 });
 
 /* ---------- wire up ---------- */
 buildModes(); syncFields();
-$('b-pause').addEventListener('click',pause);
 $('b-finish').addEventListener('click',finish);
 $('b-reset').addEventListener('click',reset);
 $('b-pdf').addEventListener('click',exportPDF);
 
 $('legend').addEventListener('input',e=>{
-  const ta=e.target; if(!ta.classList.contains('ldesc')) return;
-  const m=modeById(ta.dataset.id); if(!m) return;
-  m.desc=ta.value; save(); autosize(ta);
+  const el=e.target, m=modeById(el.dataset.id); if(!m) return;
+  if(el.classList.contains('ldesc')){ m.desc=el.value; save(); autosize(el); return; }
+  if(el.classList.contains('lnin')){ m.label=el.value; save(); renderStatic(); renderPlay(); if(m.plan) renderPlan(); return; }
+  if(el.type==='color'){ m.color=el.value; el.closest('.lrow').style.setProperty('--mc',m.color); save(); renderStatic(); renderPlay(); if(m.plan) renderPlan(); }
 });
+$('legend').addEventListener('focusin',e=>{ const el=e.target; if(el.classList.contains('lnin')){ const m=modeById(el.dataset.id); if(m) el.dataset.orig=m.label; } });
+$('legend').addEventListener('focusout',e=>{
+  const el=e.target; if(!el.classList.contains('lnin')) return;
+  const m=modeById(el.dataset.id); if(!m) return;
+  if(!m.label.trim()){ m.label='Button '+(visibleModes().indexOf(m)+1); el.value=m.label; }
+  if(el.dataset.orig!==undefined && el.dataset.orig.trim()!==m.label.trim() && m.desc){
+    m.desc=''; const ta=$('d-'+m.id); if(ta){ ta.value=''; autosize(ta); }
+    modeMsg(`"${labelOf(m.id)}" renamed, so its description was cleared. Write a new one.`);
+  }
+  delete el.dataset.orig; save(); renderStatic(); renderPlay(); if(m.plan) renderPlan();
+});
+$('legend').addEventListener('keydown',e=>{ if(e.key==='Enter' && e.target.classList.contains('lnin')) e.target.blur(); });
+$('legend').addEventListener('click',e=>{
+  const xb=e.target.closest('[data-rm]'); if(!xb) return;
+  if(!xb.dataset.armed){ xb.dataset.armed='1'; xb.textContent='Remove?'; xb.classList.add('armed');
+    setTimeout(()=>{ if(xb.isConnected){ delete xb.dataset.armed; xb.textContent='×'; xb.classList.remove('armed'); } },3000); return; }
+  removeMode(xb.dataset.rm); renderLegend(true);
+});
+$('b-addmode').addEventListener('click',addMode);
 $('legend').addEventListener('keydown',e=>{ if(e.key==='Enter' && !e.shiftKey && e.target.classList.contains('ldesc')){ e.preventDefault(); e.target.blur(); } });
 window.addEventListener('resize',()=>document.querySelectorAll('.ldesc').forEach(autosize));
 $('p-on').addEventListener('change',e=>{ S.play.on=e.target.checked; save(); renderPlay(); planSum(); tick(); });
 $('p-label').addEventListener('input',e=>{ S.play.label=e.target.value; save(); renderLap(); tick(); });
 $('p-label').addEventListener('blur',e=>{ if(!S.play.label.trim()){ S.play.label=FREE_DEFAULT; e.target.value=FREE_DEFAULT; save(); tick(); } renderPlay(); });
 $('p-label').addEventListener('keydown',e=>{ if(e.key==='Enter') e.target.blur(); });
-$('pl-on').addEventListener('change',e=>{ S.plan.on=e.target.checked; save(); renderPlan(); tick(); });
 $('b-addtask').addEventListener('click',addTask);
 const PB=$('planbody');
 PB.addEventListener('input',e=>{
   const el=e.target, i=+el.dataset.i, f=el.dataset.f, it=S.plan.items[i]; if(!it || !f) return;
-  if(f==='task') it.task=el.value;
+  const m=modeById(it.mode); if(!m) return;
+  if(f==='task'){ m.label=el.value; }
   else if(f==='min'){ const v=Math.round(+el.value); if(v>=1 && v<=600) it.min=v; else return; }
-  else if(f==='color'){ it.color=el.value; el.parentElement.style.setProperty('--mc',it.color); el.closest('tr').style.setProperty('--mc',it.color); }
-  save(); planSum(); tick();
+  else if(f==='color'){ m.color=el.value; el.parentElement.style.setProperty('--mc',m.color); el.closest('tr').style.setProperty('--mc',m.color); }
+  save(); planSum(); if(f!=='min'){ renderStatic(); renderLegend(); renderPlay(); } else tick();
 });
-PB.addEventListener('focusout',e=>{ const el=e.target; if(el.dataset && el.dataset.f==='min'){ const it=S.plan.items[+el.dataset.i]; if(it) el.value=it.min; } });
+PB.addEventListener('focusin',e=>{ const el=e.target; if(el.dataset && el.dataset.f==='task'){ const it=S.plan.items[+el.dataset.i]; const m=it&&modeById(it.mode); if(m) el.dataset.orig=m.label; } });
+PB.addEventListener('focusout',e=>{
+  const el=e.target; if(!el.dataset) return; const it=S.plan.items[+el.dataset.i]; if(!it) return;
+  if(el.dataset.f==='min') el.value=it.min;
+  if(el.dataset.f==='task'){
+    const m=modeById(it.mode); if(!m) return;
+    if(!m.label.trim()){ m.label='Task '+(+el.dataset.i+1); el.value=m.label; }
+    if(el.dataset.orig!==undefined && el.dataset.orig.trim()!==m.label.trim() && m.desc){ m.desc=''; }
+    delete el.dataset.orig; save(); renderStatic(); renderLegend(); renderPlay();
+  }
+});
 PB.addEventListener('keydown',e=>{ if(e.key==='Enter' && e.target.matches('input')) e.target.blur(); });
+let planMsgTimer=null;
+function planMsg(t){ const el=$('planmsg'); el.textContent=t; clearTimeout(planMsgTimer); if(t) planMsgTimer=setTimeout(()=>{ el.textContent=''; },6000); }
 PB.addEventListener('click',e=>{
   const b=e.target.closest('button[data-act]'); if(!b) return; const i=+b.dataset.i, A=S.plan.items;
   if(b.dataset.act==='up' && i>0){ [A[i-1],A[i]]=[A[i],A[i-1]]; }
   else if(b.dataset.act==='down' && i<A.length-1){ [A[i+1],A[i]]=[A[i],A[i+1]]; }
   else if(b.dataset.act==='del'){
+    const id=A[i].mode;
+    if(curMode()===id){ planMsg('This task\'s button is recording right now. Switch to another button or pause first.'); return; }
     if(!b.dataset.armed){ b.dataset.armed='1'; b.textContent='Delete?'; b.classList.add('armed'); setTimeout(()=>{ if(b.isConnected){ delete b.dataset.armed; b.textContent='×'; b.classList.remove('armed'); } },3000); return; }
+    const name=labelOf(id), used=S.segs.some(g=>g.m===id);
     A.splice(i,1);
+    if(used) modeById(id).hidden=true; else S.modes=S.modes.filter(m=>m.id!==id);
+    planMsg(used ? `"${name}" removed. Its recorded time stays in the log and totals.` : `"${name}" and its button removed.`);
   } else return;
-  save(); renderPlan(); tick();
+  save(); buildModes(); renderPlan(); renderStatic();
 });
-$('p-block').addEventListener('input',e=>{ const v=parseFloat(e.target.value); if(v>=1 && v<=720){ S.scaleMin=Math.round(v*10)/10; save(); planSum(); renderLap(); renderClock(); tick(); } });
-$('p-block').addEventListener('blur',e=>{ e.target.value=+S.scaleMin.toFixed(1); });
-$('p-block').addEventListener('keydown',e=>{ if(e.key==='Enter') e.target.blur(); });
 $('p-color').addEventListener('input',e=>{ S.play.color=e.target.value; e.target.parentElement.style.setProperty('--mc',S.play.color); save(); tick(); });
-$('p-counts').addEventListener('change',e=>{ const id=e.target.dataset.id; if(!id) return; S.play.counts[id]=e.target.checked; save(); tick(); });
 const LB=$('logbody');
 LB.addEventListener('input',e=>{
   const el=e.target, i=+el.dataset.i; if(Number.isNaN(i) || !S.segs[i]) return;
@@ -1231,15 +1334,15 @@ $('b-stamp').addEventListener('click',()=>{
 });
 document.addEventListener('keydown',e=>{
   if(e.target.closest('input,select,textarea')) return;
-  if($('setups').open) return;
+  if(document.querySelector('dialog[open]')) return;
   const n=/^[1-9]$/.test(e.key) ? +e.key : 0, vm=visibleModes();
   if(n && n<=vm.length && !editing){ setMode(vm[n-1].id); e.preventDefault(); }
   if(e.code==='Space'){ pause(); e.preventDefault(); }
 });
-window.addEventListener('resize',()=>{ sizeCanvas(); tick(); });
+window.addEventListener('resize',()=>{ sizeCanvas(); layoutModes(); tick(); });
 matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',tick);
 sizeCanvas(); save(); renderPlay(); renderPlan(); renderStatic(true); loop();
-if(document.fonts) document.fonts.ready.then(tick);
+if(document.fonts) document.fonts.ready.then(()=>{ layoutModes(); tick(); });
 </script>
 </body>
 </html>
