@@ -1,2 +1,2 @@
-# TallyTime
-Track on-task, off-task, and break time
+# GuideMyPlan
+Enter a plan, track actual vs. estimated for each task
