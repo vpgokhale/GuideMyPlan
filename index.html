@@ -311,7 +311,7 @@ td.rowact{white-space:nowrap; text-align:right; width:1%}
 <div class="wrap">
   <header class="top">
     <h1>GuideMyPlan</h1>
-    <div class="topright"><div class="status" id="status">Ready. To start, press a task under plan.</div><nav class="topmenu" aria-label="Menus"><button type="button" class="btn small" id="b-planner">Planner<span class="badge" id="plancount" hidden></span></button><button type="button" class="btn small" id="b-results">Session Summary</button><button type="button" class="btn small" id="b-setups">Settings</button><a class="btn small" id="b-support" href="https://forms.gle/FunqxruAm5zLpUJ58" target="_blank" rel="noopener noreferrer">Get Support</a></nav></div>
+    <div class="topright"><div class="status" id="status">Ready. To start, press a task under Session Plan.</div><nav class="topmenu" aria-label="Menus"><button type="button" class="btn small" id="b-planner">Planner<span class="badge" id="plancount" hidden></span></button><button type="button" class="btn small" id="b-results">Session Summary</button><button type="button" class="btn small" id="b-setups">Settings</button><a class="btn small" id="b-support" href="https://forms.gle/FunqxruAm5zLpUJ58" target="_blank" rel="noopener noreferrer">Get Support</a></nav></div>
   </header>
 
   <dialog id="plannerdlg" class="dlg wide" aria-labelledby="planner-h">
@@ -428,8 +428,8 @@ td.rowact{white-space:nowrap; text-align:right; width:1%}
 </div>
 
 <script>
-const APP_VERSION = '1.4';
-const APP_UPDATED = '2026-10-30T21:35:00-05:00';   // last update (Central time)
+const APP_VERSION = '1.5';
+const APP_UPDATED = '2026-10-30T21:51:00-05:00';   // last update (Central time)
 const PZ = 'pz';
 const DEFAULT_MODES = [
   {id:'off', label:'Off-Task', color:'#d2544a', desc:'Includes everything that causes a delay in completing the task, including unnecessary comments, questions, actions, and spontaneous breaks.'},
@@ -1074,7 +1074,7 @@ function tick(){
   if(S.finished && S.segs.length) st.innerHTML=`<b>Session complete</b> · ${clock(S.segs[0].s)} – ${clock(S.end)}`;
   else if(cm) st.innerHTML=`Recording <b>${esc(rowLabel(curRow()))}</b> · started ${clock(S.segs[0].s)}`;
   else if(S.segs.length) st.innerHTML='<b>Paused</b> · press a task to continue';
-  else st.textContent='Ready. To start, press a task under plan.';
+  else st.textContent='Ready. To start, press a task under Session Plan.';
 }
 let lastSec=-1;
 function loop(){ const s=Math.floor(Date.now()/250); if(s!==lastSec){ lastSec=s; tick(); } requestAnimationFrame(loop); }
