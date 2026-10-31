@@ -200,7 +200,13 @@ h1{font-size:1.45rem; margin:0; letter-spacing:.01em}
 .fnote.warn{color:var(--bad); font-weight:700}
 
 .totals{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:6px 14px}
-.trow{display:grid; grid-template-columns:auto 1fr auto auto; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--line)}
+.trow{display:grid; grid-template-columns:12px minmax(0,1fr) 5.2em 6.8em 4.8em; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--line)}
+.trow .es{font-family:var(--mono); font-variant-numeric:tabular-nums; color:var(--muted); text-align:right; font-size:.95rem}
+.trow.thead{padding:2px 0 6px}
+.trow.thead span{font-family:var(--sans); font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; font-weight:700; color:var(--muted)}
+.trow.thead .sw{display:none}
+.trow.thead .tm{text-align:right}
+.trow .tm{text-align:right}
 .trow:last-child{border-bottom:0}
 .trow .sw{width:12px; height:12px; border-radius:3px; background:var(--mc)}
 .trow .nm{font-weight:700}
@@ -422,8 +428,8 @@ td.rowact{white-space:nowrap; text-align:right; width:1%}
 </div>
 
 <script>
-const APP_VERSION = '1.2';
-const APP_UPDATED = '2026-10-30T21:20:00-05:00';   // last update (Central time)
+const APP_VERSION = '1.4';
+const APP_UPDATED = '2026-10-30T21:35:00-05:00';   // last update (Central time)
 const PZ = 'pz';
 const DEFAULT_MODES = [
   {id:'off', label:'Off-Task', color:'#d2544a', desc:'Includes everything that causes a delay in completing the task, including unnecessary comments, questions, actions, and spontaneous breaks.'},
@@ -1052,10 +1058,17 @@ function tick(){
   const now=Date.now(), t=totals(now);
   drawWheel(cx, cv.width, screenPalette(), now);
   const pi=playInfo(t);
-  $('totals').innerHTML = (S.play.on ? `<div class="trow play${pi.left>0?'':' out'}" style="--mc:${S.play.color}"><span class="sw"></span><span class="nm">${esc(freeLabel())}</span><span class="tm">${fmt(pi.left)}</span><span class="pc">of ${lapText(S.scaleMin).replace(' min','m').replace(' hr','h')}</span></div>` : '') +
-    (S.plan.items.length ? `<div class="trow plan"><span class="sw"></span><span class="nm">Planner</span><span class="tm">${fmt(planTotalMs())}</span><span class="pc">${S.plan.items.length} task${S.plan.items.length===1?'':'s'}</span></div>` : '') +
-    `<div class="trow total"><span class="sw"></span><span class="nm">Total time</span><span class="tm">${fmt(t.total)}</span><span class="pc">100%</span></div>` +
-    shownModes(t).map(m=>`<div class="trow" style="--mc:${m.color}"><span class="sw"></span><span class="nm">${esc(labelOf(m.id))}${m.hidden?' <small>(removed)</small>':''}</span><span class="tm">${fmt(t[m.id])}</span><span class="pc">${t.total?pct(t[m.id],t.total):'—'}</span></div>`).join('');
+  {
+    const estOf=id=>{ const it=S.plan.items.find(x=>x.mode===id); return it ? (+it.min||0)*60000 : null; };
+    const taskActual=S.plan.items.reduce((a,it)=>a+(t[it.mode]||0),0);
+    const row=(cls,color,name,actual,est,pc)=>`<div class="trow ${cls}"${color?` style="--mc:${color}"`:''}><span class="sw"></span><span class="nm">${name}</span><span class="es">${est}</span><span class="tm">${actual}</span><span class="pc">${pc}</span></div>`;
+    $('totals').innerHTML =
+      `<div class="trow thead"><span></span><span></span><span class="es">Est.</span><span class="tm">Actual</span><span class="pc">%</span></div>` +
+      (S.plan.items.length ? row('plan','', 'Planner Time', fmt(taskActual), fmt(planTotalMs()), `${S.plan.items.length} task${S.plan.items.length===1?'':'s'}`) : '') +
+      (S.play.on ? row(`play${pi.left>0?'':' out'}`, S.play.color, esc(freeLabel()), fmt(pi.left), '—', `of ${Math.round(S.scaleMin)}m`) : '') +
+      row('total','', 'Total time', fmt(t.total), S.plan.items.length?fmt(planTotalMs()):'—', '100%') +
+      shownModes(t).map(m=>{ const e=estOf(m.id); return row('', m.color, `${esc(labelOf(m.id))}${m.hidden?' <small>(removed)</small>':''}`, fmt(t[m.id]), e==null?'—':fmt(e), t.total?pct(t[m.id],t.total):'—'); }).join('');
+  }
   document.querySelectorAll('#logbody tr[data-i]').forEach(tr=>{ const i=+tr.dataset.i; if(S.segs[i]) tr.querySelector('.dur').textContent=fmt(segDur(i,now)); });
   const st=$('status'), cm=curMode();
   if(S.finished && S.segs.length) st.innerHTML=`<b>Session complete</b> · ${clock(S.segs[0].s)} – ${clock(S.end)}`;
