@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Guide My Plan</title>
+<title>GuideMyPlan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500;700&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -53,8 +53,19 @@ h1{font-size:1.45rem; margin:0; letter-spacing:.01em}
 .status{font-size:.9rem; color:var(--muted)}
 .status b{color:var(--ink)}
 
+.sessinfo{background:var(--surface); border:1px solid var(--line); border-radius:12px; min-width:0}
+.sessinfo > summary{list-style:none; cursor:pointer; display:flex; align-items:center; gap:12px; padding:10px 14px; border-radius:12px; min-width:0}
+.sessinfo > summary::-webkit-details-marker{display:none}
+.sessinfo > summary:focus-visible{outline:3px solid var(--focus); outline-offset:-3px}
+.sessinfo .stitle{font-size:.78rem; text-transform:uppercase; letter-spacing:.08em; font-weight:700; color:var(--ink); white-space:nowrap}
+.sessinfo .ssum{font-size:.88rem; color:var(--muted); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1}
+.sessinfo[open] .ssum{visibility:hidden}
+.sessinfo .chev{margin:0 4px 0 -2px; width:8px; height:8px; border-right:2px solid var(--muted); border-bottom:2px solid var(--muted); transform:rotate(45deg); transition:transform .15s; flex:none}
+.sessinfo .chev{transform:rotate(45deg) translate(-2px,-2px)}
+.sessinfo[open] .chev{transform:rotate(225deg) translate(-2px,-2px)}
+@media (prefers-reduced-motion:reduce){ .sessinfo .chev{transition:none} }
 .fields{display:grid; grid-template-columns:minmax(120px,1fr) minmax(140px,1.2fr) minmax(160px,1.8fr) auto auto auto; gap:12px;
-  background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px}
+  padding:0 14px 14px}
 .field{display:grid; gap:4px; min-width:0}
 .field label{font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:700}
 .field input,.field select{font:inherit; color:var(--ink); background:transparent; border:0; border-bottom:2px solid var(--line);
@@ -87,6 +98,27 @@ h1{font-size:1.45rem; margin:0; letter-spacing:.01em}
 @media (prefers-reduced-motion:reduce){.mode.active .dot{animation:none}}
 .mode{grid-template-columns:1fr}
 .mode .lbltxt{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.mode .est{margin-left:auto; font-size:.78rem; font-weight:500; color:var(--muted); white-space:nowrap; font-variant-numeric:tabular-nums}
+.mode .est:not([hidden]) + .key{margin-left:6px}
+.mode.active .est{color:rgba(255,255,255,.85)}
+.modes.compact .mode .est{font-size:.72rem}
+.statusbar{display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:10px; width:100%}
+.stbtn{font:inherit; font-weight:700; font-size:.95rem; display:inline-flex; align-items:center; gap:8px; padding:7px 14px; border-radius:999px; border:2px solid var(--mc); background:transparent; color:var(--ink); cursor:pointer; max-width:100%}
+.stbtn .dot{width:12px; height:12px; border-radius:50%; background:var(--mc); flex:none}
+.stbtn .lbltxt{overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0}
+.stbtn .key{font-family:var(--mono); font-size:.7rem; color:var(--muted); border:1px solid var(--line); border-radius:5px; padding:0 5px}
+.stbtn.active{background:var(--mc); color:#fff}
+.stbtn.active .dot{background:#fff}
+.stbtn.active .key{color:#fff; border-color:rgba(255,255,255,.5)}
+.stbtn:focus-visible{outline:3px solid var(--focus); outline-offset:2px}
+.stbtn.disabled{opacity:.45; pointer-events:none}
+.noplan{font-size:.9rem; color:var(--muted); border:1.5px dashed var(--line); border-radius:12px; padding:14px}
+.ptable td.pdesc{width:34%}
+.ptable td.pdesc input{font:inherit; font-size:.88rem; color:var(--ink); background:transparent; width:100%; min-width:0; border:1px dashed var(--line); border-radius:6px; padding:5px 8px}
+.ptable td.pdesc input:not(:placeholder-shown){border-style:solid}
+.ptable td.pdesc input:focus{outline:none; border-color:var(--focus); background:var(--bg)}
+.ptable td.ptask{width:auto}
+.sidehead{font-size:.78rem; text-transform:uppercase; letter-spacing:.08em; font-weight:700; color:var(--muted); margin:0 0 -4px}
 .mode.disabled{opacity:.45; pointer-events:none}
 .mode.editing{grid-template-columns:auto minmax(0,1fr) auto auto; align-items:center; gap:10px; padding:8px 10px; border-style:dashed}
 .mode.editing .key{margin-left:0}
@@ -143,7 +175,7 @@ h1{font-size:1.45rem; margin:0; letter-spacing:.01em}
 .legend.inlg{border:0; padding:0; margin-top:22px; background:transparent}
 .legend.inlg h3{font-size:1rem; margin:0; text-transform:none; letter-spacing:0; color:var(--ink)}
 #resultsdlg .totals{margin-top:12px}
-.ptable{min-width:560px}
+.ptable{min-width:760px}
 .ptable td.ptask{width:60%}
 .ptable td.ptask input{font:inherit; font-size:.92rem; color:var(--ink); background:transparent; width:100%; min-width:0; border:1px solid var(--line); border-radius:6px; padding:5px 8px}
 .ptable td.ptask input:focus{outline:none; border-color:var(--focus); background:var(--bg)}
@@ -165,6 +197,7 @@ h1{font-size:1.45rem; margin:0; letter-spacing:.01em}
 .clockgrp{display:flex; align-items:center; gap:10px; min-height:38px}
 .clockgrp input[type=time]{font-family:var(--mono); width:auto}
 .fnote{font-size:.78rem; color:var(--muted); min-height:1em}
+.fnote.warn{color:var(--bad); font-weight:700}
 
 .totals{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:6px 14px}
 .trow{display:grid; grid-template-columns:auto 1fr auto auto; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--line)}
@@ -197,7 +230,7 @@ h1{font-size:1.45rem; margin:0; letter-spacing:.01em}
 .loghead{display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:6px 14px; margin-bottom:8px}
 .loghead h2{margin:0}
 .loghint{font-size:.85rem; color:var(--muted)}
-table{width:100%; min-width:720px; border-collapse:collapse; font-size:.92rem}
+table{width:100%; min-width:820px; border-collapse:collapse; font-size:.92rem}
 th{text-align:left; font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); padding:6px 8px; border-bottom:1px solid var(--line); position:sticky; top:0; background:var(--surface); z-index:1}
 td{padding:6px 8px; border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums; vertical-align:middle}
 td.mono{font-family:var(--mono)}
@@ -248,6 +281,7 @@ td.rowact{white-space:nowrap; text-align:right; width:1%}
 .legend-foot b{color:var(--ink)}
 .lname .key, .mode .key{font-family:var(--mono); font-size:.75rem; color:var(--muted); border:1px solid var(--line); border-radius:5px; padding:1px 6px}
 @media (max-width:560px){ .lrow{grid-template-columns:minmax(0,1fr) auto} .lrow .ldesc{grid-column:1 / -1; grid-row:2} .lname .key{margin-left:6px} }
+.appfoot{text-align:center; font-size:.78rem; color:var(--muted); padding-top:4px; font-variant-numeric:tabular-nums}
 .sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
 
 @media (max-width:1100px){
@@ -270,20 +304,20 @@ td.rowact{white-space:nowrap; text-align:right; width:1%}
 <body>
 <div class="wrap">
   <header class="top">
-    <h1>Guide My Plan</h1>
-    <div class="topright"><div class="status" id="status">Ready. Press a button to start.</div><nav class="topmenu" aria-label="Menus"><button type="button" class="btn small" id="b-planner">Planner<span class="badge" id="plancount" hidden></span></button><button type="button" class="btn small" id="b-results">Session Summary</button><button type="button" class="btn small" id="b-setups">Settings</button><a class="btn small" id="b-support" href="https://forms.gle/FunqxruAm5zLpUJ58" target="_blank" rel="noopener noreferrer">Get Support</a></nav></div>
+    <h1>GuideMyPlan</h1>
+    <div class="topright"><div class="status" id="status">Ready. To start, press a task under plan.</div><nav class="topmenu" aria-label="Menus"><button type="button" class="btn small" id="b-planner">Planner<span class="badge" id="plancount" hidden></span></button><button type="button" class="btn small" id="b-results">Session Summary</button><button type="button" class="btn small" id="b-setups">Settings</button><a class="btn small" id="b-support" href="https://forms.gle/FunqxruAm5zLpUJ58" target="_blank" rel="noopener noreferrer">Get Support</a></nav></div>
   </header>
 
   <dialog id="plannerdlg" class="dlg wide" aria-labelledby="planner-h">
     <div class="dhead"><h2 id="planner-h">Planner</h2><button type="button" class="ib" id="b-closeplanner" aria-label="Close">×</button></div>
     <p class="dnote">List tasks in order with an estimate. They fill the inner ring of the wheel, and each task gets its own button in the same color. Remaining time comes after the last task.</p>
-    <div class="logscroll pscroll"><table class="ptable"><thead><tr><th>#</th><th>Task</th><th>Estimate</th><th>Color</th><th><span class="sr">Edit</span></th></tr></thead><tbody id="planbody"></tbody></table></div>
+    <div class="logscroll pscroll"><table class="ptable"><thead><tr><th>#</th><th>Task</th><th>Description</th><th>Estimate</th><th>Color</th><th><span class="sr">Edit</span></th></tr></thead><tbody id="planbody"></tbody></table></div>
     <div class="pfoot"><button type="button" class="btn small" id="b-addtask">+ Add task</button><span id="plansum"></span><span id="planmsg" role="status" aria-live="polite"></span></div>
     <section class="legend inlg" aria-labelledby="legend-h">
-      <div class="loghead"><h3 id="legend-h">Buttons</h3><span class="loghint">Rename, recolor or remove a button, and click a description to edit it. Keys renumber automatically.</span></div>
+      <div class="loghead"><h3 id="legend-h">Status</h3><span class="loghint">Status buttons sit under the wheel. While one is on, the wheel fills in its color instead of the task's, and that time counts as the status.</span></div>
       <div id="legend"></div>
-      <div class="pfoot"><button type="button" class="btn small" id="b-addmode">+ Add button</button><span id="keymsg" role="status" aria-live="polite"></span></div>
-      <div class="legend-foot"><b>Paused</b> rows stop the clock and are not counted. Press a button's number key to switch, <b>Space</b> to pause, or tap the active button again to pause.</div>
+      <div class="pfoot"><button type="button" class="btn small" id="b-addmode">+ Add status</button><span id="keymsg" role="status" aria-live="polite"></span></div>
+      <div class="legend-foot">Number keys switch tasks, letter keys (Q, W, E…) turn statuses on and off, and <b>Space</b> pauses. <b>Paused</b> rows stop the clock and are not counted.</div>
     </section>
     <div class="dfoot"><button type="button" class="btn small primary" id="b-doneplanner">Done</button></div>
   </dialog>
@@ -321,37 +355,41 @@ td.rowact{white-space:nowrap; text-align:right; width:1%}
     <div id="setupmsg" role="status" aria-live="polite"></div>
   </dialog>
 
-  <section class="fields" aria-label="Session details">
-    <div class="field"><label for="f-date">Date</label><input id="f-date" type="text" autocomplete="off"></div>
-    <div class="field"><label for="f-tracker">Tracker (Name)</label><input id="f-tracker" type="text" placeholder="Who is recording" autocomplete="off"></div>
-    <div class="field"><label for="f-task">Task</label><input id="f-task" type="text" placeholder="e.g. Math worksheet, p. 14" autocomplete="off"></div>
-    <div class="field"><label for="f-scale">Wheel = 1 lap</label>
-      <div class="lapgrp"><input id="f-scale" type="number" min="0.1" max="720" step="any" inputmode="decimal" aria-describedby="lapnote"><select id="f-unit" aria-label="Wheel lap unit"><option value="min">min</option><option value="hr">hr</option></select></div>
-      <span class="fnote" id="lapnote"></span>
-    </div>
-    <div class="field clockfield">
-      <span class="flabel">Clock display</span>
-      <div class="clockgrp">
-        <label class="switch"><input type="checkbox" id="c-on" role="switch" aria-label="Clock display"><span class="trk"><span class="knob"></span></span></label>
-        <span id="clockset" hidden><label for="c-start" class="sr">Clock start time</label><input id="c-start" type="time" step="60"></span>
+  <details class="sessinfo" id="sessinfo" open>
+    <summary><span class="stitle">Session Info</span><span class="chev" aria-hidden="true"></span><span class="ssum" id="sesssum"></span></summary>
+    <section class="fields" aria-label="Session info">
+      <div class="field"><label for="f-date">Date</label><input id="f-date" type="text" autocomplete="off"></div>
+      <div class="field"><label for="f-tracker">Tracker (Name)</label><input id="f-tracker" type="text" placeholder="Who is recording" autocomplete="off"></div>
+      <div class="field"><label for="f-task">Task</label><input id="f-task" type="text" placeholder="e.g. Math worksheet, p. 14" autocomplete="off"></div>
+      <div class="field"><label for="f-scale">Wheel = 1 lap</label>
+        <div class="lapgrp"><input id="f-scale" type="number" min="0.1" max="720" step="any" inputmode="decimal" aria-describedby="lapnote"><select id="f-unit" aria-label="Wheel lap unit"><option value="min">min</option><option value="hr">hr</option></select></div>
+        <span class="fnote" id="lapnote"></span>
       </div>
-      <span class="fnote" id="clocknote"></span>
-    </div>
-    <div class="field remfield">
-      <input id="p-label" class="flabel-in" type="text" maxlength="32" title="Click to rename" aria-label="Name for remaining time" autocomplete="off">
-      <div class="clockgrp">
-        <label class="switch"><input type="checkbox" id="p-on" role="switch" aria-label="Display Remaining Time"><span class="trk"><span class="knob"></span></span></label>
-        <label class="cpick sm" title="Color for remaining time"><input type="color" id="p-color" aria-label="Color for remaining time"></label>
+      <div class="field clockfield">
+        <span class="flabel">Clock display</span>
+        <div class="clockgrp">
+          <label class="switch"><input type="checkbox" id="c-on" role="switch" aria-label="Clock display"><span class="trk"><span class="knob"></span></span></label>
+          <span id="clockset" hidden><label for="c-start" class="sr">Clock start time</label><input id="c-start" type="time" step="60"></span>
+        </div>
+        <span class="fnote" id="clocknote"></span>
       </div>
-      <span class="fnote"></span>
-    </div>
-  </section>
+      <div class="field remfield">
+        <input id="p-label" class="flabel-in" type="text" maxlength="32" title="Click to rename" aria-label="Name for remaining time" autocomplete="off">
+        <div class="clockgrp">
+          <label class="switch"><input type="checkbox" id="p-on" role="switch" aria-label="Display Remaining Time"><span class="trk"><span class="knob"></span></span></label>
+          <label class="cpick sm" title="Color for remaining time"><input type="color" id="p-color" aria-label="Color for remaining time"></label>
+        </div>
+        <span class="fnote"></span>
+      </div>
+    </section>
+  </details>
 
   <section class="main">
-    <div class="wheelbox"><canvas id="wheel" aria-label="Time wheel showing on-task, off-task and break time"></canvas></div>
+    <div class="wheelbox"><canvas id="wheel" aria-label="Time wheel showing recorded and planned time"></canvas><div class="statusbar" id="statusbar" role="group" aria-label="Status"></div></div>
 
     <div class="side">
-      <div class="modes" id="modes"></div>
+      <h2 class="sidehead" id="plan-h">Session Plan</h2>
+      <div class="modes" id="modes" role="group" aria-labelledby="plan-h"></div>
 
 
 
@@ -376,13 +414,16 @@ td.rowact{white-space:nowrap; text-align:right; width:1%}
 
   <section class="log">
     <div class="loghead"><h2>Segment log</h2><span class="loghint">Fix mistakes here: change a start time or mode, add a row with +, or delete with ×. Each row runs until the next row starts.</span></div>
-    <div class="logscroll"><table><thead><tr><th>#</th><th>Start</th><th>Mode</th><th>Duration</th><th>Note (optional)</th><th><span class="sr">Edit</span></th></tr></thead><tbody id="logbody"></tbody></table></div>
+    <div class="logscroll"><table><thead><tr><th>#</th><th>Start</th><th>Task</th><th>Status</th><th>Duration</th><th>Note (optional)</th><th><span class="sr">Edit</span></th></tr></thead><tbody id="logbody"></tbody></table></div>
     <div id="logmsg" role="status" aria-live="polite"></div>
   </section>
 
+  <footer class="appfoot" id="appfoot"></footer>
 </div>
 
 <script>
+const APP_VERSION = '1.2';
+const APP_UPDATED = '2026-10-30T21:20:00-05:00';   // last update (Central time)
 const PZ = 'pz';
 const DEFAULT_MODES = [
   {id:'off', label:'Off-Task', color:'#d2544a', desc:'Includes everything that causes a delay in completing the task, including unnecessary comments, questions, actions, and spontaneous breaks.'},
@@ -392,12 +433,13 @@ const DESC_PH = '<Enter description>';
 const NEW_COLORS = ['#3b7dd8','#8a5cc7','#d9668f','#2aa3a3','#7a8f2e','#c76b2e','#5b6bd6','#b0475e','#4f8a5b'];
 const MAX_MODES = 9;
 const PZ_PDF = '#a3aab6';
-const STORE = 'task-time-tracker-v1';
+const STORE = 'guidemyplan-v1';
+const OLD_STORE = 'task-time-tracker-v1';   // earlier name; read once so saved sessions carry over
 
 function todayStr(){ const d=new Date(); return d.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'}); }
 function fresh(){ return {v:2, date:todayStr(), tracker:'', task:'', scaleMin:60,
   modes:DEFAULT_MODES.map(m=>({...m})), segs:[], end:null, finished:false, parking:''}; }
-function load(){ try{ const s=JSON.parse(localStorage.getItem(STORE)); if(s && s.segs) return s; }catch(e){} return null; }
+function load(){ try{ const s=JSON.parse(localStorage.getItem(STORE) || localStorage.getItem(OLD_STORE)); if(s && s.segs) return s; }catch(e){} return null; }
 function save(){ try{ localStorage.setItem(STORE, JSON.stringify(S)); }catch(e){} }
 
 /* Data model: each row has a start time; it lasts until the next row starts.
@@ -463,7 +505,19 @@ function clock(t){ return new Date(t).toLocaleTimeString([], {hour:'numeric', mi
 function timeVal(t){ const d=new Date(t); return [d.getHours(),d.getMinutes(),d.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':'); }
 function segEnd(i, now){ return i < S.segs.length-1 ? S.segs[i+1].s : (S.end ?? now); }
 function segDur(i, now){ return Math.max(0, segEnd(i, now) - S.segs[i].s); }
-function curMode(){ if(S.finished || !S.segs.length) return null; const m=S.segs[S.segs.length-1].m; return m===PZ ? null : m; }
+// Statuses (Off-Task, Break, …) are the buttons you add yourself; tasks come from the Planner.
+// A row can be a task, a status on its own, or a task with a status switched on (g.st), which overrides the task's color.
+function isStatus(id){ const m=modeById(id); return !!m && !m.plan; }
+function statusModes(){ return S.modes.filter(m=>!m.hidden && !m.plan); }
+function taskModes(){ return S.plan.items.map(it=>modeById(it.mode)).filter(m=>m && !m.hidden); }
+function rowStatus(g){ return g.st || (g.m!==PZ && isStatus(g.m) ? g.m : null); }
+function rowTask(g){ return (g.m===PZ || isStatus(g.m)) ? null : g.m; }
+function rowColorId(g){ return rowStatus(g) || g.m; }
+function rowLabel(g){ if(g.m===PZ) return 'Paused'; const t=rowTask(g), st=rowStatus(g); return t && st ? `${labelOf(t)} · ${labelOf(st)}` : labelOf(t||st); }
+function curRow(){ if(S.finished || !S.segs.length) return null; const g=S.segs[S.segs.length-1]; return g.m===PZ ? null : g; }
+function curTask(){ const g=curRow(); return g ? rowTask(g) : null; }
+function curStatus(){ const g=curRow(); return g ? rowStatus(g) : null; }
+function curMode(){ return curTask() || curStatus(); }
 function visibleModes(){
   const manual=S.modes.filter(m=>!m.hidden && !m.plan);
   const planned=S.plan.items.map(it=>S.modes.find(m=>m.id===it.mode)).filter(m=>m && !m.hidden);
@@ -473,9 +527,13 @@ function manualCount(){ return S.modes.filter(m=>!m.hidden && !m.plan).length; }
 function modeById(id){ return S.modes.find(m=>m.id===id); }
 function labelOf(id){ if(id===PZ) return 'Paused'; const m=modeById(id); return m ? (m.label.trim() || 'Untitled') : 'Unknown'; }
 function colorOf(id, pdf){ if(id===PZ) return pdf ? PZ_PDF : 'var(--pz)'; const m=modeById(id); return m ? m.color : '#888888'; }
-function keyOf(id){ const i=visibleModes().findIndex(m=>m.id===id); return i>=0 && i<9 ? String(i+1) : ''; }
+const STATUS_KEYS='QWERTYUIOP';
+function keyOf(id){
+  if(isStatus(id)){ const i=statusModes().findIndex(m=>m.id===id); return i>=0 && i<STATUS_KEYS.length ? STATUS_KEYS[i] : ''; }
+  const i=taskModes().findIndex(m=>m.id===id); return i>=0 && i<9 ? String(i+1) : '';
+}
 function shownModes(t){ return S.modes.filter(m=>!m.hidden || (t && t[m.id]>0)); }   // removed buttons still show if they have time
-function purgeModes(){ S.modes = S.modes.filter(m=>!m.hidden || S.segs.some(g=>g.m===m.id)); }
+function purgeModes(){ S.modes = S.modes.filter(m=>!m.hidden || S.segs.some(g=>g.m===m.id || g.st===m.id)); }
 function lapMin(){ return S.scaleMin; }      // one length for the dial, the clock window and the free-time block
 function lapText(m){ m=+m; if(m>=60 && m%60===0) return `${m/60} hr`; if(m>60) return `${Math.floor(m/60)} hr ${Math.round(m%60)} min`; return `${+m.toFixed(2)} min`; }
 function hm(min){ min=((Math.round(min)%1440)+1440)%1440; const h=Math.floor(min/60), mm=min%60; return {h, mm, h12:(h%12)||12, ap:h<12?'AM':'PM'}; }
@@ -500,26 +558,37 @@ function playInfo(t){
 }
 function totals(now){
   const t={total:0}; S.modes.forEach(m=>t[m.id]=0);
-  S.segs.forEach((g,i)=>{ if(g.m===PZ) return; const d=segDur(i,now); t[g.m]=(t[g.m]||0)+d; t.total+=d; });
+  S.segs.forEach((g,i)=>{ if(g.m===PZ) return; const d=segDur(i,now), k=rowStatus(g)||g.m; t[k]=(t[k]||0)+d; t.total+=d; });
   return t;
 }
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function pct(a,b){ return b? Math.round(a/b*100)+'%' : '—'; }
 
 /* ---------- live actions ---------- */
-function pushRow(m, now){
+function pushRow(m, now, st){
+  st=st||null;
   const last=S.segs[S.segs.length-1];
-  if(last && last.m===m) return;
-  if(last && now-last.s<1000){ last.m=m; }          // switched within a second: just relabel
-  else S.segs.push({m, s:now, note:''});
+  if(last && last.m===m && (last.st||null)===st) return;
+  if(last && now-last.s<1000){ last.m=m; if(st) last.st=st; else delete last.st; }   // switched within a second: just relabel
+  else { const r={m, s:now, note:''}; if(st) r.st=st; S.segs.push(r); }
 }
 function setMode(m){
   if(S.finished) return;
-  const now=Date.now(), cur=curMode();
-  const next = cur===m ? PZ : m;
-  if(!S.segs.length && next===PZ) return;
+  lastNote=0;
+  if(isStatus(m)){ toggleStatus(m); return; }
+  const now=Date.now(), ct=curTask(), cs=curStatus();
   if(!S.segs.length && !S.date.trim()){ S.date=todayStr(); $('f-date').value=S.date; }
-  pushRow(next, now); save(); renderStatic(true);
+  if(ct===m) pushRow(PZ, now);            // tap the active task again to pause
+  else pushRow(m, now, cs);               // a status that is on stays on
+  save(); renderStatic(true);
+}
+function toggleStatus(sid){
+  if(S.finished) return;
+  const now=Date.now(), ct=curTask(), cs=curStatus();
+  if(!S.segs.length && !S.date.trim()){ S.date=todayStr(); $('f-date').value=S.date; }
+  if(cs===sid){ if(ct) pushRow(ct, now, null); else pushRow(PZ, now); }
+  else { if(ct) pushRow(ct, now, sid); else pushRow(sid, now); }
+  save(); renderStatic(true);
 }
 function pause(){ if(S.finished || !curMode()) return; pushRow(PZ, Date.now()); save(); renderStatic(true); }
 function finish(){
@@ -565,7 +634,7 @@ function logMsg(text, bad){
 function insertAfter(i){
   const now=Date.now(), a=S.segs[i].s, b=segEnd(i, now);
   const s=Math.floor((a+b)/2000)*1000;
-  const vm=visibleModes(), alt=vm.find(x=>x.id!==S.segs[i].m) || vm[0];
+  const tm=taskModes(), alt=tm.find(x=>x.id!==rowTask(S.segs[i])) || tm[0] || statusModes()[0];
   const m = alt ? alt.id : S.segs[i].m;
   S.segs.splice(i+1, 0, {m, s:Math.max(a, Math.min(s, b)), note:''});
   save(); renderStatic();
@@ -606,32 +675,44 @@ function layoutModes(){
 }
 function buildModes(){
   const box=$('modes'); box.innerHTML='';
-  visibleModes().forEach(m=>{
+  const tm=taskModes();
+  if(!tm.length){ box.innerHTML='<div class="noplan">No tasks yet. Open the <b>Planner</b> to add the tasks for this session.</div>'; }
+  tm.forEach(m=>{
     const k=keyOf(m.id);
     const row=document.createElement('div'); row.className='mode'; row.id='mode-'+m.id;
     row.style.setProperty('--mc', m.color);
-    row.innerHTML=`<button class="go" id="go-${m.id}"><span class="dot"></span><span class="lbltxt">${esc(labelOf(m.id))}</span>${k?`<span class="key">${k}</span>`:''}</button>`;
+    row.innerHTML=`<button class="go" id="go-${m.id}"><span class="dot"></span><span class="lbltxt">${esc(labelOf(m.id))}</span><span class="est"></span>${k?`<span class="key">${k}</span>`:''}</button>`;
     row.querySelector('.go').addEventListener('click',()=>setMode(m.id));
     box.appendChild(row);
   });
+  const sb=$('statusbar'); sb.innerHTML='';
+  statusModes().forEach(m=>{
+    const k=keyOf(m.id);
+    const btn=document.createElement('button'); btn.type='button'; btn.className='stbtn'; btn.id='st-'+m.id;
+    btn.style.setProperty('--mc', m.color); btn.setAttribute('aria-pressed','false');
+    btn.innerHTML=`<span class="dot"></span><span class="lbltxt">${esc(labelOf(m.id))}</span>${k?`<span class="key">${k}</span>`:''}`;
+    btn.addEventListener('click',()=>toggleStatus(m.id));
+    sb.appendChild(btn);
+  });
+  sb.hidden=!sb.children.length;
   layoutModes();
   renderLegend(); renderPlay();
 }
 function addMode(){
-  if(manualCount()>=MAX_MODES){ modeMsg(`You can have up to ${MAX_MODES} buttons, plus one for each planned task.`, true); return; }
+  if(manualCount()>=MAX_MODES){ modeMsg(`You can have up to ${MAX_MODES} statuses.`, true); return; }
   const used=new Set(S.modes.map(m=>m.color.toLowerCase()));
   const color=NEW_COLORS.find(c=>!used.has(c)) || NEW_COLORS[S.modes.length % NEW_COLORS.length];
   const id='m'+Date.now().toString(36);
-  S.modes.push({id, label:'New mode', color, desc:''});
+  S.modes.push({id, label:'New status', color, desc:''});
   save(); buildModes(); renderStatic(); renderLegend(true);
   const li=$('l-'+id); if(li){ li.focus(); li.select(); }
-  modeMsg(`Button added with key ${keyOf(id)||'(none)'}. Type a name for it.`);
+  modeMsg(`Status added with key ${keyOf(id)||'(none)'}. Type a name for it.`);
 }
 function removeMode(id){
   const vm=visibleModes();
-  if(vm.length<=1){ modeMsg('Keep at least one button.', true); return; }
-  if(curMode()===id){ modeMsg('This button is recording right now. Switch to another button or pause first.', true); buildModes(); return; }
-  const name=labelOf(id), used=S.segs.some(g=>g.m===id);
+  if(!modeById(id).plan && statusModes().length<=1){ modeMsg('Keep at least one status.', true); return; }
+  if(curTask()===id || curStatus()===id){ modeMsg('This is on right now. Turn it off or switch first.', true); buildModes(); return; }
+  const name=labelOf(id), used=S.segs.some(g=>g.m===id || g.st===id);
   if(modeById(id).plan){ S.plan.items=S.plan.items.filter(it=>it.mode!==id); }
   if(used) modeById(id).hidden=true; else S.modes=S.modes.filter(m=>m.id!==id);
   save(); buildModes(); renderPlan(); renderStatic();
@@ -641,10 +722,11 @@ function autosize(ta){ ta.style.height='auto'; ta.style.height=ta.scrollHeight+'
 function renderPlan(){
   const pb=$('planbody');
   if(pb.contains(document.activeElement) && document.activeElement.matches('input[type=text],input[type=number]')) return;   // don't interrupt typing
-  if(!S.plan.items.length){ pb.innerHTML='<tr><td colspan="5" class="empty">No tasks yet. Add the tasks you expect to do and how long each should take. Each task also gets its own button.</td></tr>'; }
+  if(!S.plan.items.length){ pb.innerHTML='<tr><td colspan="6" class="empty">No tasks yet. Add the tasks you expect to do and how long each should take. Each task also gets its own button.</td></tr>'; }
   else pb.innerHTML=S.plan.items.map((it,i)=>{ const m=modeById(it.mode)||{label:'',color:'#888888'}; return `<tr data-i="${i}" style="--mc:${m.color}">
       <td class="num">${i+1}</td>
       <td class="ptask"><input id="pt-${i}" data-i="${i}" data-f="task" type="text" maxlength="24" placeholder="Task name" value="${esc(m.label)}" aria-label="Task ${i+1} name" autocomplete="off"></td>
+      <td class="pdesc"><input id="pd-${i}" data-i="${i}" data-f="desc" type="text" maxlength="200" placeholder="${esc(DESC_PH)}" value="${esc(m.desc||'')}" aria-label="Task ${i+1} description" autocomplete="off"></td>
       <td><span class="pnum"><input id="pm-${i}" data-i="${i}" data-f="min" type="number" min="1" max="600" step="1" inputmode="numeric" value="${+it.min||''}" aria-label="Task ${i+1} estimate in minutes"> min</span></td>
       <td><label class="cpick sm" style="--mc:${m.color}" title="Task and button color"><input type="color" data-i="${i}" data-f="color" value="${m.color}" aria-label="Task ${i+1} color"></label></td>
       <td class="rowact"><button type="button" class="ib" data-act="up" data-i="${i}" title="Move up" aria-label="Move task ${i+1} up"${i===0?' disabled':''}>↑</button><button type="button" class="ib" data-act="down" data-i="${i}" title="Move down" aria-label="Move task ${i+1} down"${i===S.plan.items.length-1?' disabled':''}>↓</button><button type="button" class="ib del" data-act="del" data-i="${i}" title="Delete task and its button" aria-label="Delete task ${i+1}">×</button></td>
@@ -678,16 +760,16 @@ function renderLegend(force){
   const box=$('legend'); if(!box) return;
   const ae=document.activeElement;
   if(!force && box.contains(ae) && (ae.tagName==='TEXTAREA' || (ae.tagName==='INPUT' && ae.type==='text'))) return;   // don't interrupt typing
-  box.innerHTML = visibleModes().map(m=>{
+  box.innerHTML = statusModes().map(m=>{
     const k=keyOf(m.id);
     return `<div class="lrow" data-id="${m.id}" style="--mc:${m.color}">
       <div class="lname">
         <label class="cpick xs" title="Button color"><input type="color" data-id="${m.id}" value="${m.color}" aria-label="Color for ${esc(labelOf(m.id))}"></label>
         <input class="lnin" id="l-${m.id}" data-id="${m.id}" type="text" maxlength="24" value="${esc(m.label)}" aria-label="Button name" autocomplete="off">
-        ${k?`<span class="key" title="Keyboard key">${k}</span>`:'<span class="key nokey" title="Only the first 9 buttons get keys">–</span>'}
+        ${k?`<span class="key" title="Keyboard key">${k}</span>`:'<span class="key nokey" title="No key for this one">–</span>'}
       </div>
       <textarea class="ldesc" id="d-${m.id}" data-id="${m.id}" rows="1" placeholder="${esc(DESC_PH)}" aria-label="Description for ${esc(labelOf(m.id))}">${esc(m.desc||'')}</textarea>
-      <button type="button" class="ib del" data-rm="${m.id}" title="${m.plan?'Remove this task and its button':'Remove this button'}" aria-label="Remove ${esc(labelOf(m.id))}">×</button>
+      <button type="button" class="ib del" data-rm="${m.id}" title="Remove this status" aria-label="Remove ${esc(labelOf(m.id))}">×</button>
     </div>`; }).join('');
   box.querySelectorAll('textarea').forEach(autosize);
   const ab=$('b-addmode'); if(ab) ab.disabled = manualCount()>=MAX_MODES;
@@ -697,8 +779,16 @@ function syncFields(){
   $('f-date').value=S.date; $('f-tracker').value=S.tracker; $('f-task').value=S.task; renderLap(); renderClock();
   $('f-parking').value=S.parking;
 }
+function renderSessSum(){
+  const parts=[S.date, S.tracker, S.task].map(x=>(x||'').trim()).filter(Boolean);
+  parts.push(`${lapText(S.scaleMin)} wheel`);
+  if(S.clock.on) parts.push(clockRange());
+  if(S.play.on) parts.push(`${freeLabel()} on`);
+  $('sesssum').textContent=parts.join(' · ');
+}
 for(const [id,key] of [['f-date','date'],['f-tracker','tracker'],['f-task','task'],['f-parking','parking']])
-  $(id).addEventListener('input',e=>{ S[key]=e.target.value; save(); });
+  $(id).addEventListener('input',e=>{ S[key]=e.target.value; save(); renderSessSum(); });
+$('sessinfo').addEventListener('toggle',()=>{ renderSessSum(); layoutModes(); });
 function renderLap(){
   const f=$('f-scale'), u=$('f-unit');
   u.value=S.scaleUnit;
@@ -707,9 +797,10 @@ function renderLap(){
   $('lapnote').textContent = '';
 }
 function renderClock(){
+  if($('sesssum')) renderSessSum();
   $('c-on').checked=S.clock.on; $('clockset').hidden=!S.clock.on;
   if(document.activeElement!==$('c-start')) $('c-start').value=S.clock.start;
-  $('clocknote').textContent = S.clock.on ? `Ends ${clockLong(clockStartMin()+lapMin())}` : '';
+  clockNote();
 }
 function lapChanged(){ save(); renderClock(); if($('plansum')) planSum(); tick(); }
 $('f-scale').addEventListener('input',e=>{
@@ -728,30 +819,37 @@ $('c-start').addEventListener('blur',renderClock);
 /* ---------- render (static parts) ---------- */
 function renderStatic(scrollToEnd){
   purgeModes();
-  const cur=curMode();
+  const ct=curTask(), cs=curStatus();
   for(const m of visibleModes()){
-    const row=$('mode-'+m.id); if(!row) continue;
+    const row=$('mode-'+m.id) || $('st-'+m.id); if(!row) continue;
     row.style.setProperty('--mc',m.color);
     const lt=row.querySelector('.lbltxt'); if(lt) lt.textContent=labelOf(m.id);
-    row.classList.toggle('active',!editing && cur===m.id);
-    row.classList.toggle('disabled',S.finished && !editing);
+    const es=row.querySelector('.est'); if(es){ const it=S.plan.items.find(x=>x.mode===m.id); es.textContent = it ? `est. ${lapText(+it.min||0)}` : ''; es.hidden=!it; }
+    const on = m.plan ? ct===m.id : cs===m.id;
+    row.classList.toggle('active', on);
+    if(!m.plan) row.setAttribute('aria-pressed', on?'true':'false');
+    row.classList.toggle('disabled', S.finished);
   }
   $('b-finish').disabled = S.finished || !S.segs.length;
 
   const tb=$('logbody');
-  if(!S.segs.length){ tb.innerHTML='<tr><td colspan="6" class="empty">No segments yet. Press a button to begin.</td></tr>'; }
+  if(!S.segs.length){ tb.innerHTML='<tr><td colspan="7" class="empty">No segments yet. Press a task to begin.</td></tr>'; }
   else{
     const ae=document.activeElement, fid=ae && ae.id && tb.contains(ae) ? ae.id : null;
     const caret = fid && fid.startsWith('n-') ? ae.selectionStart : null;
     const lastLive = !S.finished;
     tb.innerHTML = S.segs.map((g,i)=>{
       const live = lastLive && i===S.segs.length-1;
-      const ids = visibleModes().map(m=>m.id); if(g.m!==PZ && !ids.includes(g.m)) ids.push(g.m); ids.push(PZ);
-      const opts = ids.map(id=>`<option value="${id}"${id===g.m?' selected':''}>${esc(labelOf(id))}</option>`).join('');
-      return `<tr data-i="${i}" class="${live?'live':''}${g.m===PZ?' paused':''}" style="--mc:${colorOf(g.m)}">
+      const tk=rowTask(g), st=rowStatus(g);
+      const tids=taskModes().map(m=>m.id); if(tk && !tids.includes(tk)) tids.push(tk);
+      const topts = `<option value=""${!tk && g.m!==PZ?' selected':''}>—</option>` + tids.map(id=>`<option value="${id}"${id===tk?' selected':''}>${esc(labelOf(id))}</option>`).join('') + `<option value="${PZ}"${g.m===PZ?' selected':''}>Paused</option>`;
+      const sids=statusModes().map(m=>m.id); if(st && !sids.includes(st)) sids.push(st);
+      const sopts = `<option value=""${!st?' selected':''}>None</option>` + sids.map(id=>`<option value="${id}"${id===st?' selected':''}>${esc(labelOf(id))}</option>`).join('');
+      return `<tr data-i="${i}" class="${live?'live':''}${g.m===PZ?' paused':''}" style="--mc:${g.m===PZ?'var(--pz)':colorOf(rowColorId(g))}">
         <td class="num">${i+1}</td>
         <td><input class="tin" id="t-${i}" data-i="${i}" type="time" step="1" value="${timeVal(g.s)}" aria-label="Start time for row ${i+1}"></td>
-        <td class="modecell"><i></i><select class="msel" id="m-${i}" data-i="${i}" aria-label="Mode for row ${i+1}">${opts}</select></td>
+        <td class="modecell"><i></i><select class="msel" id="m-${i}" data-i="${i}" aria-label="Task for row ${i+1}">${topts}</select></td>
+        <td><select class="msel ssel" id="s-${i}" data-i="${i}" aria-label="Status for row ${i+1}"${g.m===PZ?' disabled':''}>${sopts}</select></td>
         <td class="mono dur"></td>
         <td class="note"><input id="n-${i}" data-i="${i}" type="text" placeholder="Add a note" value="${esc(g.note||'')}" aria-label="Note for row ${i+1}" autocomplete="off"></td>
         <td class="rowact"><button type="button" class="ib" data-act="ins" data-i="${i}" title="Insert a row after row ${i+1}" aria-label="Insert a row after row ${i+1}">+</button><button type="button" class="ib del" data-act="del" data-i="${i}" title="Delete row ${i+1}" aria-label="Delete row ${i+1}">×</button></td>
@@ -772,12 +870,20 @@ function drawWheel(ctx, size, pal, now){
   const pieces=[]; let cum=0;
   S.segs.forEach((g,i)=>{
     if(g.m===PZ) return;
-    if(CK){ let a=g.s-t0, b=segEnd(i,now)-t0; if(b<=0) return; a=Math.max(0,a); if(b>a) pieces.push([a,b,g.m]); }
-    else { const d=segDur(i,now); pieces.push([cum,cum+d,g.m]); cum+=d; }
+    if(CK){
+      let a=g.s-t0, b=segEnd(i,now)-t0;
+      // time recorded shortly before the clock start (within one lap) is drawn just before the top of the dial
+      if(a<0 && b>-L){ const pa=Math.max(a,-L), pb=Math.min(b,0); if(pb>pa) pieces.push([L+pa, L+pb, rowColorId(g), true]); }
+      if(b<=0) return; a=Math.max(0,a); if(b>a) pieces.push([a,b,rowColorId(g)]);
+    }
+    else { const d=segDur(i,now); pieces.push([cum,cum+d,rowColorId(g)]); cum+=d; }
   });
   const nowPos = CK ? (S.segs.length ? (S.finished ? S.end : now)-t0 : -1) : T.total;
-  const reach = Math.max(nowPos, ...pieces.map(x=>x[1]), 0);
-  const laps=Math.min(4, Math.max(1, Math.ceil(reach/L) || 1));
+  const reach = Math.max(nowPos, ...pieces.filter(x=>!x[3]).map(x=>x[1]), 0);
+  // clock mode shows the window; one extra ring only for a session that started inside it and ran past the end
+  const outside = CK && S.segs.length && S.segs[0].s - t0 >= L;
+  const laps = CK ? (outside ? 1 : Math.min(2, Math.max(1, Math.ceil(reach/L) || 1)))
+                  : Math.min(4, Math.max(1, Math.ceil(reach/L) || 1));
   const longLbl = CK || Lmin>60;
   const R = size/2 - size*(longLbl ? 0.115 : 0.075);
   const usable = R*0.58;
@@ -840,8 +946,9 @@ function drawWheel(ctx, size, pal, now){
   }
   if(!drewZero) drawTick(0, true, CK ? clockShort(base) : '0');   // start of the dial is always marked
 
-  if(tot>0){
-    const k=Math.min(laps-1, Math.floor(tot/L)), t=ang(tot), rr=ringR(k);
+  const dotPos = (CK && tot<0 && tot>-L) ? L+tot : tot;     // still before the clock start: dot sits just before the top
+  if(dotPos>0 && dotPos < L*laps){
+    const k=Math.min(laps-1, Math.floor(dotPos/L)), t=ang(dotPos), rr=ringR(k);
     ctx.beginPath(); ctx.fillStyle=pal.ink;
     ctx.arc(c+Math.cos(t)*rr, c+Math.sin(t)*rr, w*0.22, 0, Math.PI*2); ctx.fill();
   }
@@ -891,9 +998,9 @@ function drawWheel(ctx, size, pal, now){
 
   const fitFont=(txt, weight, px, maxW, fam)=>{ let f=px; ctx.font=`${weight} ${f}px ${fam}`; while(f>8 && ctx.measureText(txt).width>maxW){ f-=1; ctx.font=`${weight} ${f}px ${fam}`; } };
   ctx.textAlign='center'; ctx.textBaseline='middle';
-  const cm=curMode();
-  const cur = cm ? labelOf(cm) : (S.finished ? 'Complete' : (S.segs.length ? 'Paused' : 'Ready'));
-  ctx.fillStyle = cm ? colorOf(cm) : pal.muted;
+  const cr=curRow();
+  const cur = cr ? rowLabel(cr) : (S.finished ? 'Complete' : (S.segs.length ? 'Paused' : 'Ready'));
+  ctx.fillStyle = cr ? colorOf(rowColorId(cr)) : pal.muted;
   fitFont(cur, 700, Math.round(Math.min(size*0.05, inner*0.24)), inner*1.6, pal.sans);
   ctx.fillText(cur, c, c-inner*0.32);
   ctx.font=`700 ${Math.round(Math.min(size*0.085, inner*0.36))}px ${pal.mono}`;
@@ -927,7 +1034,21 @@ function screenPalette(){
 const cv=$('wheel'), cx=cv.getContext('2d');
 function sizeCanvas(){ const r=cv.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
   cv.width=Math.round(r.width*dpr); cv.height=Math.round(r.width*dpr); }
+function clockNote(){
+  const el=$('clocknote'); if(!el) return;
+  if(!S.clock.on){ el.textContent=''; el.classList.remove('warn'); return; }
+  let txt=`Ends ${clockLong(clockStartMin()+lapMin())}`, warn=false;
+  if(S.segs.length){
+    const t0=clockStartTs(), L=lapMin()*60000, first=S.segs[0].s, last=S.finished?S.end:Date.now();
+    if(first >= t0+L || last < t0-L){ txt+=' · recorded time is outside this window'; warn=true; }
+    else if(last > t0+L){ txt+=' · ran past the end'; }
+    else if(first < t0){ txt+=` · started early (${clock(first).replace(/:\d\d (?=[AP]M)/,' ')})`; }
+  }
+  el.textContent=txt; el.classList.toggle('warn',warn);
+}
+let lastNote=0;
 function tick(){
+  if(S.clock.on && Date.now()-lastNote>5000){ lastNote=Date.now(); clockNote(); }
   const now=Date.now(), t=totals(now);
   drawWheel(cx, cv.width, screenPalette(), now);
   const pi=playInfo(t);
@@ -938,9 +1059,9 @@ function tick(){
   document.querySelectorAll('#logbody tr[data-i]').forEach(tr=>{ const i=+tr.dataset.i; if(S.segs[i]) tr.querySelector('.dur').textContent=fmt(segDur(i,now)); });
   const st=$('status'), cm=curMode();
   if(S.finished && S.segs.length) st.innerHTML=`<b>Session complete</b> · ${clock(S.segs[0].s)} – ${clock(S.end)}`;
-  else if(cm) st.innerHTML=`Recording <b>${esc(labelOf(cm))}</b> · started ${clock(S.segs[0].s)}`;
-  else if(S.segs.length) st.innerHTML='<b>Paused</b> · press a button to continue';
-  else st.textContent='Ready. Press a button to start.';
+  else if(cm) st.innerHTML=`Recording <b>${esc(rowLabel(curRow()))}</b> · started ${clock(S.segs[0].s)}`;
+  else if(S.segs.length) st.innerHTML='<b>Paused</b> · press a task to continue';
+  else st.textContent='Ready. To start, press a task under plan.';
 }
 let lastSec=-1;
 function loop(){ const s=Math.floor(Date.now()/250); if(s!==lastSec){ lastSec=s; tick(); } requestAnimationFrame(loop); }
@@ -955,7 +1076,7 @@ function exportPDF(){
   let y=M;
 
   doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor('#636b7a');
-  doc.text('GUIDE MY PLAN', M, y-4, {charSpace:1.2});
+  doc.text('GUIDEMYPLAN', M, y-4, {charSpace:1.2});
   doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor('#1d2330');
   doc.text('Time Record', M, y+12); y+=36;
 
@@ -1003,7 +1124,7 @@ function exportPDF(){
   doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor('#636b7a');
   doc.text(`${counted} segment${counted===1?'':'s'} recorded${paused?` · ${paused} pause${paused===1?'':'s'} (not counted)`:''}`, tx, ty+4);
   if(S.play.on){
-    doc.text(doc.splitTextToSize(`${freeLabel()} = wheel time − time used − planned time still left`, W-M-tx), tx, ty+16);
+    doc.text(doc.splitTextToSize(`${freeLabel()} = wheel time - time used - planned time still left`, W-M-tx), tx, ty+16);
   }
 
   y+=wSize+18;
@@ -1054,11 +1175,11 @@ function exportPDF(){
   }
 
   const head=()=>{ doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor('#636b7a');
-    doc.text('#',M,y); doc.text('START',M+24,y); doc.text('MODE',M+108,y); doc.text('DURATION',M+188,y); doc.text('NOTE',M+262,y);
+    doc.text('#',M,y); doc.text('START',M+24,y); doc.text('TASK · STATUS',M+108,y); doc.text('DURATION',M+226,y); doc.text('NOTE',M+296,y);
     doc.setDrawColor('#dde1e8'); doc.line(M,y+5,W-M,y+5); y+=18; };
   doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor('#1d2330'); doc.text('Segment log', M, y); y+=16;
   head();
-  const noteW = W-M-(M+262);
+  const noteW = W-M-(M+296);
   S.segs.forEach((g,i)=>{
     doc.setFont('helvetica','normal'); doc.setFontSize(9.5);
     const nLines = (g.note||'').trim() ? doc.splitTextToSize(g.note.trim(), noteW) : [];
@@ -1067,31 +1188,38 @@ function exportPDF(){
     const ink = g.m===PZ ? '#8a92a0' : '#1d2330';
     doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(ink);
     doc.text(String(i+1), M, y); doc.text(clock(g.s), M+24, y);
-    doc.setFillColor(colorOf(g.m,true)); doc.circle(M+111, y-3.5, 3.5, 'F'); doc.text(fit(labelOf(g.m), 64), M+119, y);
-    doc.setFont('courier','normal'); doc.text(fmt(segDur(i,now)), M+188, y);
-    if(nLines.length){ doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor('#3a4150'); doc.text(nLines, M+262, y); }
+    doc.setFillColor(g.m===PZ?PZ_PDF:colorOf(rowColorId(g),true)); doc.circle(M+111, y-3.5, 3.5, 'F'); doc.text(fit(rowLabel(g), 102), M+119, y);
+    doc.setFont('courier','normal'); doc.text(fmt(segDur(i,now)), M+226, y);
+    if(nLines.length){ doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor('#3a4150'); doc.text(nLines, M+296, y); }
     y+=rowH;
   });
   if(!S.segs.length){ doc.setFont('helvetica','italic'); doc.setFontSize(10); doc.text('No segments recorded.', M, y); }
 
   const safe=s=>String(s||'').trim().replace(/[^\w\-]+/g,'_').slice(0,40);
+  const pages=doc.getNumberOfPages();
+  for(let pg=1; pg<=pages; pg++){
+    doc.setPage(pg); doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor('#8a92a0');
+    doc.text(`GuideMyPlan v${APP_VERSION}`, M, 780);
+    doc.text(`Exported ${new Date().toLocaleString([], {year:'numeric', month:'short', day:'numeric', hour:'numeric', minute:'2-digit'})}${pages>1?` · Page ${pg} of ${pages}`:''}`, W-M, 780, {align:'right'});
+  }
   doc.save(`GuideMyPlan_${safe(S.date)||'session'}${S.tracker?'_'+safe(S.tracker):''}.pdf`);
 }
 
 /* ---------- setups (save / load configuration) ---------- */
-const PRESET_STORE='tallytime-setups-v1';
-function loadPresets(){ try{ const o=JSON.parse(localStorage.getItem(PRESET_STORE)); return o && typeof o==='object' ? o : {}; }catch(e){ return {}; } }
+const PRESET_STORE='guidemyplan-setups-v1';
+const OLD_PRESET_STORE='tallytime-setups-v1';
+function loadPresets(){ try{ const o=JSON.parse(localStorage.getItem(PRESET_STORE) || localStorage.getItem(OLD_PRESET_STORE)); return o && typeof o==='object' ? o : {}; }catch(e){ return {}; } }
 function savePresets(o){ try{ localStorage.setItem(PRESET_STORE, JSON.stringify(o)); return true; }catch(e){ return false; } }
 const HEX=/^#[0-9a-f]{6}$/i;
 function currentConfig(){
-  return {app:'Guide My Plan', kind:'setup', version:1, savedAt:new Date().toISOString(),
+  return {app:'GuideMyPlan', kind:'setup', version:1, savedAt:new Date().toISOString(),
     modes:visibleModes().map(m=>({id:m.id, label:m.label, color:m.color, desc:m.desc||'', ...(m.plan?{plan:true}:{})})),
     scaleMin:S.scaleMin, scaleUnit:S.scaleUnit, clock:{on:S.clock.on, start:S.clock.start},
     play:{on:S.play.on, label:S.play.label, block:S.scaleMin, color:S.play.color, counts:{...S.play.counts}},
     plan:{items:S.plan.items.map(i=>({mode:i.mode, min:i.min}))}};
 }
 function cleanConfig(c){
-  if(!c || typeof c!=='object' || !Array.isArray(c.modes) || !c.modes.length) throw new Error('This file is not a Guide My Plan settings file.');
+  if(!c || typeof c!=='object' || !Array.isArray(c.modes) || !c.modes.length) throw new Error('This file is not a GuideMyPlan settings file.');
   const seen=new Set(), idMap={};
   let manualN=0;
   const modes=c.modes.filter(m=>m && (m.plan || manualN++ < MAX_MODES)).slice(0,MAX_MODES+40).map((m,i)=>{
@@ -1122,10 +1250,10 @@ function cleanConfig(c){
 function applyConfig(raw){
   const c=cleanConfig(raw), ids=new Set(c.modes.map(m=>m.id));
   // buttons not in the setup but already used in this session stay (hidden) so their time isn't lost
-  const keep=S.modes.filter(m=>!ids.has(m.id) && S.segs.some(g=>g.m===m.id)).map(m=>({...m, hidden:true}));
+  const keep=S.modes.filter(m=>!ids.has(m.id) && S.segs.some(g=>g.m===m.id || g.st===m.id)).map(m=>({...m, hidden:true}));
   S.modes=[...c.modes, ...keep];
   S.scaleMin=c.scaleMin; S.scaleUnit=c.scaleUnit; S.clock=c.clock; S.play=c.play; S.plan=c.plan;
-  let paused=false; const cm=curMode(); if(cm && modeById(cm).hidden){ pushRow(PZ, Date.now()); paused=true; }
+  let paused=false; const ct=curTask(), cs=curStatus(); if((ct && modeById(ct).hidden) || (cs && modeById(cs).hidden)){ pushRow(PZ, Date.now()); paused=true; }
   editing=false; save(); syncFields(); buildModes(); renderPlay(); renderPlan(); renderStatic(true);
   return paused;
 }
@@ -1197,7 +1325,7 @@ $('b-download').addEventListener('click',()=>{
 $('f-loadfile').addEventListener('change',e=>{
   const f=e.target.files && e.target.files[0]; if(!f) return;
   const r=new FileReader();
-  r.onload=()=>{ try{ const c=JSON.parse(r.result); afterLoad(f.name, applyConfig(c)); }catch(err){ setupMsg(err instanceof SyntaxError ? 'That file couldn\'t be read. Choose a Guide My Plan settings file (.json).' : err.message, 'bad'); } e.target.value=''; };
+  r.onload=()=>{ try{ const c=JSON.parse(r.result); afterLoad(f.name, applyConfig(c)); }catch(err){ setupMsg(err instanceof SyntaxError ? 'That file couldn\'t be read. Choose a GuideMyPlan settings file (.json).' : err.message, 'bad'); } e.target.value=''; };
   r.onerror=()=>{ setupMsg('That file couldn\'t be read.', 'bad'); e.target.value=''; };
   r.readAsText(f);
 });
@@ -1206,6 +1334,14 @@ $('b-defaults').addEventListener('click',e=>{
   const paused=applyConfig({modes:DEFAULT_MODES, scaleMin:60, scaleUnit:'min', clock:{on:false,start:'16:30'}, play:{on:false,label:FREE_DEFAULT,block:60,color:'#57a6e8',counts:{}}, plan:{items:[]}});
   setupMsg('Default buttons and settings restored.'+(paused?' The session is paused because the recording button was removed.':''), 'good');
 });
+
+/* ---------- version footer ---------- */
+function versionText(){
+  const d=new Date(APP_UPDATED);
+  const when=d.toLocaleString(undefined,{year:'numeric', month:'short', day:'numeric', hour:'numeric', minute:'2-digit', timeZoneName:'short'});
+  return `GuideMyPlan v${APP_VERSION} · Last updated ${when}`;
+}
+$('appfoot').textContent=versionText();
 
 /* ---------- wire up ---------- */
 buildModes(); syncFields();
@@ -1250,7 +1386,8 @@ PB.addEventListener('input',e=>{
   const el=e.target, i=+el.dataset.i, f=el.dataset.f, it=S.plan.items[i]; if(!it || !f) return;
   const m=modeById(it.mode); if(!m) return;
   if(f==='task'){ m.label=el.value; }
-  else if(f==='min'){ const v=Math.round(+el.value); if(v>=1 && v<=600) it.min=v; else return; }
+  else if(f==='desc'){ m.desc=el.value; save(); return; }
+  else if(f==='min'){ const v=Math.round(+el.value); if(v>=1 && v<=600){ it.min=v; renderStatic(); } else return; }
   else if(f==='color'){ m.color=el.value; el.parentElement.style.setProperty('--mc',m.color); el.closest('tr').style.setProperty('--mc',m.color); }
   save(); planSum(); if(f!=='min'){ renderStatic(); renderLegend(); renderPlay(); } else tick();
 });
@@ -1261,7 +1398,7 @@ PB.addEventListener('focusout',e=>{
   if(el.dataset.f==='task'){
     const m=modeById(it.mode); if(!m) return;
     if(!m.label.trim()){ m.label='Task '+(+el.dataset.i+1); el.value=m.label; }
-    if(el.dataset.orig!==undefined && el.dataset.orig.trim()!==m.label.trim() && m.desc){ m.desc=''; }
+    if(el.dataset.orig!==undefined && el.dataset.orig.trim()!==m.label.trim() && m.desc){ m.desc=''; const d=$('pd-'+el.dataset.i); if(d) d.value=''; }
     delete el.dataset.orig; save(); renderStatic(); renderLegend(); renderPlay();
   }
 });
@@ -1274,7 +1411,7 @@ PB.addEventListener('click',e=>{
   else if(b.dataset.act==='down' && i<A.length-1){ [A[i+1],A[i]]=[A[i],A[i+1]]; }
   else if(b.dataset.act==='del'){
     const id=A[i].mode;
-    if(curMode()===id){ planMsg('This task\'s button is recording right now. Switch to another button or pause first.'); return; }
+    if(curTask()===id){ planMsg('This task is recording right now. Switch to another task or pause first.'); return; }
     if(!b.dataset.armed){ b.dataset.armed='1'; b.textContent='Delete?'; b.classList.add('armed'); setTimeout(()=>{ if(b.isConnected){ delete b.dataset.armed; b.textContent='×'; b.classList.remove('armed'); } },3000); return; }
     const name=labelOf(id), used=S.segs.some(g=>g.m===id);
     A.splice(i,1);
@@ -1309,8 +1446,19 @@ LB.addEventListener('focusout',e=>{
 });
 LB.addEventListener('change',e=>{
   const el=e.target; if(!el.classList.contains('msel')) return;
-  const i=+el.dataset.i; if(!S.segs[i]) return;
-  S.segs[i].m=el.value; save(); renderStatic();
+  const i=+el.dataset.i, g=S.segs[i]; if(!g) return;
+  const v=el.value;
+  if(el.classList.contains('ssel')){            // status column
+    const tk=rowTask(g);
+    if(v){ if(tk) g.st=v; else { g.m=v; delete g.st; } }
+    else { if(tk) delete g.st; else { g.m=PZ; delete g.st; } }
+  } else {                                       // task column
+    const st=rowStatus(g);
+    if(v===PZ){ g.m=PZ; delete g.st; }
+    else if(v===''){ if(st){ g.m=st; delete g.st; } else { g.m=PZ; delete g.st; } }
+    else { g.m=v; if(st) g.st=st; else delete g.st; }
+  }
+  save(); renderStatic();
 });
 LB.addEventListener('click',e=>{
   const b=e.target.closest('button[data-act]'); if(!b) return;
@@ -1335,8 +1483,11 @@ $('b-stamp').addEventListener('click',()=>{
 document.addEventListener('keydown',e=>{
   if(e.target.closest('input,select,textarea')) return;
   if(document.querySelector('dialog[open]')) return;
-  const n=/^[1-9]$/.test(e.key) ? +e.key : 0, vm=visibleModes();
-  if(n && n<=vm.length && !editing){ setMode(vm[n-1].id); e.preventDefault(); }
+  if(e.metaKey || e.ctrlKey || e.altKey) return;
+  const n=/^[1-9]$/.test(e.key) ? +e.key : 0, tm=taskModes();
+  if(n && n<=tm.length){ setMode(tm[n-1].id); e.preventDefault(); }
+  const si=STATUS_KEYS.indexOf(e.key.toUpperCase()), sm=statusModes();
+  if(e.key.length===1 && si>=0 && si<sm.length){ toggleStatus(sm[si].id); e.preventDefault(); }
   if(e.code==='Space'){ pause(); e.preventDefault(); }
 });
 window.addEventListener('resize',()=>{ sizeCanvas(); layoutModes(); tick(); });
